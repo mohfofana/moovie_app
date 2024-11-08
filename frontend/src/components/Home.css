@@ -7,7 +7,6 @@
 }
 
 body {
-    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://image.tmdb.org/t/p/original/oyKYPA1UXwwgrjmnM30sh33IRG5.jpg');
     background-size: cover; 
     background-position: center;
     background-attachment: fixed; 
@@ -188,15 +187,54 @@ body {
     overflow-x: hidden; 
 }
 
+.popular, .watchlist, .favorites {
+    margin-top: 3rem;
+    padding: 2rem;
+}
+
+
+
+.card-slider {
+    display: flex;
+    overflow-x: auto;
+    gap: 1rem;
+    padding: 1rem 0;
+    scroll-behavior: smooth;
+}
+
+.card:hover {
+    transform: scale(1.1); /* Agrandir légèrement la carte */
+    z-index: 15; /* La carte est au premier plan lors du survol */
+}
+
+.card-slider::-webkit-scrollbar {
+    height: 8px;
+    display: none;
+}
+
+.card-slider::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.card-slider::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.small-cards .card {
+    width: 150px; /* Taille réduite pour Watchlist et Favorites */
+}
+
 .card {
-    flex: 1 0 20%; 
+    flex: 1 0 20%;  /* Chaque carte occupera 20% de la largeur de son conteneur */
     background-color: #333;
     color: white;
     border-radius: 10px;
     overflow: hidden;
     text-align: center;
-    padding: 0.5rem;
-    width: auto; 
+    padding: 1rem;
+    margin-bottom: 1rem; /* Espacement en bas de chaque carte */
+    max-width: 200px;  /* Limiter la taille maximale de chaque carte */
 }
 
 .card img {
@@ -215,4 +253,10 @@ body {
 .favorites-section h2 {
     font-size: 1.5rem;
     margin-bottom: 0.5rem;
+}
+
+.popular-section,
+.watchlist-section,
+.favorites-section {
+    margin-bottom: 2rem;
 }
