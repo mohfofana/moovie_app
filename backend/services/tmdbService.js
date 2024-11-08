@@ -222,3 +222,33 @@ export const getMediaById = async (mediaId) => {
       throw error;
   }
 }; 
+
+
+export const getRandomItemFromTMDB = async (category) => {
+  try {
+    // Récupérer une page aléatoire
+    const randomPage = Math.floor(Math.random() * 20) + 1;  // Limité ici à 20 pages
+    const response = await axios.get(`${BASE_URL}/discover/${category}`, {
+      params: {
+        api_key: API_KEY,
+        page: randomPage,
+        language: 'fr-FR',  // Langue de l'interface
+      },
+    });
+
+    // Choisir un élément aléatoire parmi les résultats
+    const randomIndex = Math.floor(Math.random() * response.data.results.length);
+    const item = response.data.results[randomIndex];
+
+    // Retourner les informations importantes de l'élément
+    return {
+      title: item.title || item.name,  // Le titre
+      overview: item.overview,  // La description
+      image: `https://image.tmdb.org/t/p/w500${item.poster_path}`,  // L'image
+      background: `https://image.tmdb.org/t/p/original${item.backdrop_path}`,  // Couverture de fond
+    };
+  } catch (error) {
+    console.error('Erreur TMDb:', error);
+    throw new Error('Impossible de récupérer les données de TMDb');
+  }
+};
