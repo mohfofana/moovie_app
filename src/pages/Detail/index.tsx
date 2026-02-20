@@ -29,10 +29,10 @@ const Detail = () => {
     document.title =
       (movie?.title || movie?.name) && !isLoading
         ? movie.title || movie.name
-        : "tMovies";
+        : "Cinescope";
 
     return () => {
-      document.title = "tMovies";
+      document.title = "Cinescope";
     };
   }, [movie?.title, isLoading, movie?.name]);
 
@@ -57,55 +57,62 @@ const Detail = () => {
   } = movie;
 
   const backgroundStyle = {
-    backgroundImage: `linear-gradient(to top, rgba(0,0,0), rgba(0,0,0,0.98),rgba(0,0,0,0.8) ,rgba(0,0,0,0.4)),url('https://image.tmdb.org/t/p/original/${posterPath}'`,
-    backgroundPosition: "top",
+    backgroundImage: `
+      radial-gradient(circle at 20% 30%, rgba(0, 217, 255, 0.08), transparent 35%),
+      radial-gradient(circle at 80% 70%, rgba(255, 0, 128, 0.06), transparent 35%),
+      linear-gradient(to top, rgba(10,10,10,1), rgba(10,10,10,0.98) 60%, rgba(10,10,10,0.85) 80%, rgba(10,10,10,0.5)),
+      url('https://image.tmdb.org/t/p/original/${posterPath}')`,
+    backgroundPosition: "top center",
     backgroundSize: "cover",
   };
 
   return (
     <>
-      <section className="w-full" style={backgroundStyle}>
+      <section className="w-full relative" style={backgroundStyle}>
+        {/* Grain overlay */}
+        <div className="absolute inset-0 opacity-20 mix-blend-overlay pointer-events-none bg-[url('data:image/svg+xml,%3Csvg viewBox=\"0 0 400 400\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cfilter id=\"noiseFilter\"%3E%3CfeTurbulence type=\"fractalNoise\" baseFrequency=\"2\" numOctaves=\"3\" stitchTiles=\"stitch\"/%3E%3C/filter%3E%3Crect width=\"100%25\" height=\"100%25\" filter=\"url(%23noiseFilter)\"/%3E%3C/svg%3E')]" />
+
         <div
-          className={`${maxWidth} lg:py-36 sm:py-[136px] sm:pb-28 xs:py-28 xs:pb-12 pt-24 pb-8 flex flex-row lg:gap-12 md:gap-10 gap-8 justify-center `}
+          className={`${maxWidth} lg:py-40 sm:py-36 sm:pb-32 xs:py-32 xs:pb-16 pt-28 pb-12 flex flex-row lg:gap-16 md:gap-12 gap-10 justify-center relative z-10`}
         >
           <Poster title={title} posterPath={posterPath} />
           <m.div
             variants={staggerContainer(0.2, 0.4)}
             initial="hidden"
             animate="show"
-            className="text-gray-300 sm:max-w-[80vw] max-w-[90vw]  md:max-w-[520px] font-nunito flex flex-col lg:gap-5 sm:gap-4 xs:gap-[14px] gap-3 mb-8 flex-1"
+            className="text-gray-200 sm:max-w-[80vw] max-w-[90vw] md:max-w-[560px] font-nunito flex flex-col lg:gap-6 sm:gap-5 xs:gap-4 gap-3 mb-8 flex-1"
           >
             <m.h2
               variants={fadeDown}
-              className={cn(mainHeading, " md:max-w-[420px]")}
+              className={cn(mainHeading, "md:max-w-[480px] leading-tight tracking-tight")}
             >
               {title || name}
             </m.h2>
 
             <m.ul
               variants={fadeDown}
-              className="flex flex-row items-center  sm:gap-[14px] xs:gap-3 gap-[6px] flex-wrap"
+              className="flex flex-row items-center sm:gap-3 xs:gap-2.5 gap-2 flex-wrap"
             >
               {genres.map((genre: { name: string; id: number }) => {
                 return <Genre key={genre.id} name={genre.name} />;
               })}
             </m.ul>
 
-            <m.p variants={fadeDown} className={paragraph}>
+            <m.p variants={fadeDown} className={cn(paragraph, "leading-relaxed text-gray-300")}>
               <span>
-                {overview.length > 280
-                  ? `${show ? overview : `${overview.slice(0, 280)}...`}`
+                {overview.length > 300
+                  ? `${show ? overview : `${overview.slice(0, 300)}...`}`
                   : overview}
               </span>
               <button
                 type="button"
                 className={cn(
-                  `font-bold ml-1 hover:underline transition-all duration-300`,
-                  overview.length > 280 ? "inline-block" : "hidden"
+                  `font-bold ml-1.5 text-accent-cyan hover:text-accent-magenta transition-colors duration-300`,
+                  overview.length > 300 ? "inline-block" : "hidden"
                 )}
                 onClick={toggleShow}
               >
-                {!show ? "show more" : "show less"}
+                {!show ? "Read more →" : "Show less ←"}
               </button>
             </m.p>
 

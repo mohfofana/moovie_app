@@ -15,17 +15,23 @@ const Logo: React.FC<logoProps> = ({
 }) => (
   <Link
     to="/"
-    className={cn(`flex flex-row items-center xs:gap-2 gap-[6px])`, className)}
+    className={cn(
+      `flex flex-row items-center xs:gap-2.5 gap-2 group transition-all duration-200`,
+      className
+    )}
   >
     <img
       src={logo}
       alt="logo"
-      className="sm:h-[28px] h-[24px] sm:w-[28px] w-[24px]"
+      className="sm:h-[30px] h-[26px] sm:w-[30px] w-[26px] transition-opacity duration-200 group-hover:opacity-70"
     />
     <span
-      className={cn(logoColor,`font-semibold sm:text-[18px] text-[16.75px]`)}
+      className={cn(
+        logoColor,
+        `font-robotoCondensed tracking-tight sm:text-[26px] text-[22px] leading-none font-bold transition-opacity duration-200 group-hover:opacity-70`
+      )}
     >
-      tMovies
+      Cinescope
     </span>
   </Link>
 );

@@ -1,21 +1,20 @@
-export const maxWidth = "max-w-[1140px] mx-auto md:px-8 sm:px-6 px-4 xl:px-0";
+export const maxWidth = "max-w-[1220px] mx-auto md:px-8 sm:px-6 px-4 xl:px-0";
 export const smallMaxWidth =
-  "max-w-[940px] mx-auto md:px-8 sm:px-6 px-4 xl:px-0";
+  "max-w-[980px] mx-auto md:px-8 sm:px-6 px-4 xl:px-0";
 
 export const listItem =
-  "flex flex-row gap-3 py-1 px-[10px] items-center w-full dark:hover:text-primary hover:text-black transition-all duration-300 font-nunito font-semibold ";
+  "flex flex-row gap-3 py-2 px-3 items-center w-full dark:hover:text-white hover:text-black transition-all duration-200 font-nunito font-medium rounded-lg hover:bg-white/5";
 
 export const sideBarHeading =
-  "xs:mb-[6px] mb-1 font-nunito font-bold  text-[15.75px] dark:text-gray-50 text-[#333]";
+  "xs:mb-2 mb-1.5 font-nunito font-semibold text-base dark:text-white text-black tracking-tight";
 
-export const activeListItem = "dark:text-secColor text-black font-semibold";
+export const activeListItem = "dark:text-white text-black font-semibold bg-white/8";
 
 export const watchBtn =
-  "sm:text-base xs:text-[14.75px] text-[13.75px]  xs:py-2 py-[6px] sm:px-6 xs:px-5 px-[18px] hover:-translate-y-[2px] transition-all duration-300 active:translate-y-[1px] rounded-full text-secColor font-medium";
+  "sm:text-[15px] xs:text-[14px] text-[13px] tracking-[-0.01em] xs:py-3 py-2.5 sm:px-8 xs:px-7 px-6 transition-all duration-250 rounded-full font-semibold";
 
-export const mainHeading = `sm:text-4xl xs:text-3xl text-[28.75px] font-extrabold sm:leading-[1.2] xs:leading-normal leading-snug text-secColor sm:max-w-[420px] xs:max-w-[320px] max-w-[280px]`;
+export const mainHeading = `font-robotoCondensed sm:text-[80px] xs:text-[60px] text-[48px] tracking-[-0.02em] sm:leading-[0.88] xs:leading-[0.92] leading-[0.95] text-white sm:max-w-[580px] xs:max-w-[420px] max-w-[360px] font-bold`;
 
+export const paragraph = `font-nunito sm:text-[17px] xs:text-[16px] text-[15px] leading-[1.5] tracking-[-0.01em]`;
 
-export const paragraph = `sm:text-base xs:text-[15.75px] text-[14.25px] leading-relaxed`;
-
-export const textColor = "dark:text-secColor text-black"; 
+export const textColor = "dark:text-white text-black"; 

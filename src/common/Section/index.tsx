@@ -56,24 +56,23 @@ const Section: FC<SectionProps> = ({
   const errorMessage = isError ? getErrorMessage(error) : "";
 
   const sectionStyle = cn(
-    `sm:py-[20px] xs:py-[18.75px] py-[16.75px] font-nunito`,
+    `sm:py-10 xs:py-9 py-8 font-nunito`,
     className
   );
   const linkStyle = cn(
-    `sm:py-1 py-[2px] sm:text-[14px] xs:text-[12.75px] text-[12px] sm:px-4 px-3 rounded-full  dark:text-gray-300 hover:-translate-y-1 transition-all duration-300`,
+    `group sm:py-2 py-1.5 sm:text-[13px] xs:text-[12.5px] text-[12px] tracking-tight font-medium sm:px-5 px-4 rounded-full dark:text-gray-300 text-gray-700 transition-all duration-200`,
     theme === "Dark" ? "view-all-btn--dark" : "view-all-btn--light"
   );
 
   return (
     <section className={sectionStyle} ref={ref}>
-      <div className="flex flex-row justify-between items-center mb-[22.75px]">
-        <div className=" relative">
-          <h3 className="sm:text-[22.25px] xs:text-[20px] text-[18.75px] dark:text-gray-50 sm:font-bold font-semibold">{title}</h3>
-          <div className="line" />
-        </div>
+      <div className="flex flex-row justify-between items-center mb-6">
+        <h3 className="font-roboto sm:text-[32px] xs:text-[28px] text-[24px] tracking-tight text-gray-900 dark:text-white font-semibold">
+          {title}
+        </h3>
         {!showSimilarShows && (
           <Link to={`/${category}?type=${type}`} className={linkStyle}>
-            View all
+            See All
           </Link>
         )}
       </div>

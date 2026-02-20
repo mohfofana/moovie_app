@@ -61,7 +61,7 @@ const Header = () => {
   return (
     <header
       className={cn(
-        `md:py-[16px] py-[14.5px]  fixed top-0 left-0 w-full z-10 transition-all duration-50`,
+        `md:py-5 py-4 fixed top-0 left-0 w-full z-50 transition-all duration-300`,
         isActive && (theme === "Dark" ? "header-bg--dark" : "header-bg--light")
       )}
     >
@@ -71,15 +71,15 @@ const Header = () => {
         <Logo
           logoColor={cn(
             isNotFoundPage
-              ? "text-black dark:text-primary"
+              ? "text-black dark:text-white"
               : !isNotFoundPage && isActive
-              ? "text-black dark:text-primary"
-              : "text-primary"
+              ? "text-black dark:text-white"
+              : "text-white"
           )}
         />
 
-        <div className=" hidden md:flex flex-row gap-8 items-center text-gray-600 dark:text-gray-300">
-          <ul className="flex flex-row gap-8 capitalize text-[14.75px] font-medium">
+        <div className="hidden md:flex flex-row gap-12 items-center text-gray-700 dark:text-gray-400">
+          <ul className="flex flex-row gap-8 text-[14px] font-medium">
             {navLinks.map((link: { title: string; path: string }) => {
               return (
                 <HeaderNavItem
@@ -99,13 +99,13 @@ const Header = () => {
               onClick={openMenu}
               id="theme"
               className={cn(
-                `flex items-center justify-center mb-[2px] transition-all duration-100 hover:scale-110`,
+                `flex items-center justify-center rounded-full p-2 transition-all duration-200 hover:bg-white/10`,
                 isNotFoundPage || isActive
-                  ? ` ${textColor} dark:hover:text-secColor hover:text-black `
-                  : ` dark:hover:text-secColor text-gray-300 `
+                  ? `text-gray-700 dark:text-white`
+                  : `text-white/90`
               )}
             >
-              {theme === "Dark" ? <BsMoonStarsFill /> : <FiSun />}
+              {theme === "Dark" ? <BsMoonStarsFill size={15} /> : <FiSun size={15} />}
             </button>
             <AnimatePresence>
               {showThemeOptions && <ThemeMenu />}
@@ -117,10 +117,10 @@ const Header = () => {
           type="button"
           name="menu"
           className={cn(
-            `inline-block text-[22.75px] md:hidden  transition-all duration-300`,
+            `inline-block text-[22px] md:hidden transition-all duration-200 p-2 rounded-lg hover:bg-white/10`,
             isNotFoundPage || isActive
-              ? `${textColor} dark:hover:text-secColor hover:text-black `
-              : ` dark:hover:text-secColor text-secColor`
+              ? `text-gray-700 dark:text-white`
+              : `text-white/90`
           )}
           onClick={() => setShowSidebar(true)}
         >
