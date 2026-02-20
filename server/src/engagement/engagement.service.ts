@@ -5,6 +5,7 @@ import { JwtUser } from '../common/jwt-auth.guard';
 import { PrismaService } from '../prisma/prisma.service';
 import { TmdbService } from '../titles/tmdb.service';
 import { CreateInteractionDto } from './dto/create-interaction.dto';
+import { GetRecommendationsDto } from './dto/get-recommendations.dto';
 import { SaveProgressDto } from './dto/save-progress.dto';
 
 @Injectable()
@@ -84,6 +85,80 @@ export class EngagementService {
         episode: true,
       },
     });
+  }
+
+  async getRecommendations(user: JwtUser, query: GetRecommendationsDto) {
+    const profile = await this.requireActiveProfile(user);
+    const limit = query.limit ?? 20;
+
+    const [interactions, watchHistory] = await Promise.all([
+      this.prisma.interaction.findMany({
+        where: { profileId: profile.id },
+        include: { title: true },
+        orderBy: { viewedAt: 'desc' },
+        take: 200,
+      }),
+      this.prisma.watchHistory.findMany({
+        where: { profileId: profile.id },
+        include: { title: true },
+        orderBy: { updatedAt: 'desc' },
+        take: 200,
+      }),
+    ]);
+
+    const preferredGenres = new Map<number, number>();
+    const seenTitleIds = new Set<string>();
+
+    for (const item of interactions) {
+      seenTitleIds.add(item.titleId);
+      const weight = item.liked === true ? 3 : item.viewedAt ? 1 : 0;
+      if (weight > 0) {
+        this.accumulateGenres(preferredGenres, this.extractGenreIds(item.title.metadataJson), weight);
+      }
+    }
+
+    for (const item of watchHistory) {
+      seenTitleIds.add(item.titleId);
+      const weight = item.completed ? 2 : item.progressSeconds >= 600 ? 1 : 0;
+      if (weight > 0) {
+        this.accumulateGenres(preferredGenres, this.extractGenreIds(item.title.metadataJson), weight);
+      }
+    }
+
+    const candidates = await this.prisma.title.findMany({
+      where: {
+        ...(query.type ? { type: query.type } : {}),
+      },
+      orderBy: [{ popularity: 'desc' }, { updatedAt: 'desc' }],
+      take: 500,
+    });
+
+    const scored = candidates
+      .map((title) => {
+        const genreIds = this.extractGenreIds(title.metadataJson);
+        const genreScore = genreIds.reduce((acc, genreId) => acc + (preferredGenres.get(genreId) ?? 0), 0);
+        const popularityScore = title.popularity ?? 0;
+        const seenPenalty = seenTitleIds.has(title.id) ? -50 : 0;
+        const score = genreScore * 100 + popularityScore + seenPenalty;
+
+        return {
+          score,
+          title,
+          matchedGenres: genreIds.filter((id) => preferredGenres.has(id)),
+        };
+      })
+      .sort((a, b) => b.score - a.score)
+      .slice(0, limit);
+
+    return {
+      profileId: profile.id,
+      seedCount: preferredGenres.size,
+      items: scored.map((item) => ({
+        score: item.score,
+        matchedGenres: item.matchedGenres,
+        title: item.title,
+      })),
+    };
   }
 
   async saveProgress(user: JwtUser, dto: SaveProgressDto) {
@@ -220,5 +295,40 @@ export class EngagementService {
     }
 
     return byInternalId;
+  }
+
+  private extractGenreIds(metadataJson: Prisma.JsonValue | null): number[] {
+    if (!metadataJson || typeof metadataJson !== 'object' || Array.isArray(metadataJson)) {
+      return [];
+    }
+
+    const data = metadataJson as {
+      genre_ids?: unknown;
+      genres?: unknown;
+    };
+
+    if (Array.isArray(data.genre_ids)) {
+      return data.genre_ids.filter((item): item is number => typeof item === 'number');
+    }
+
+    if (Array.isArray(data.genres)) {
+      return data.genres
+        .map((item) => {
+          if (!item || typeof item !== 'object') {
+            return null;
+          }
+          const id = (item as { id?: unknown }).id;
+          return typeof id === 'number' ? id : null;
+        })
+        .filter((item): item is number => item !== null);
+    }
+
+    return [];
+  }
+
+  private accumulateGenres(target: Map<number, number>, genreIds: number[], weight: number) {
+    for (const genreId of genreIds) {
+      target.set(genreId, (target.get(genreId) ?? 0) + weight);
+    }
   }
 }

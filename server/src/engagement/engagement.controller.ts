@@ -5,7 +5,6 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
   Post,
   Query,
   UseGuards,
@@ -14,6 +13,7 @@ import {
 import { CurrentUser } from '../common/current-user.decorator';
 import { JwtAuthGuard, JwtUser } from '../common/jwt-auth.guard';
 import { CreateInteractionDto } from './dto/create-interaction.dto';
+import { GetRecommendationsDto } from './dto/get-recommendations.dto';
 import { SaveProgressDto } from './dto/save-progress.dto';
 import { EngagementService } from './engagement.service';
 
@@ -44,6 +44,11 @@ export class EngagementController {
   @Get('watch/continue')
   getContinueWatching(@CurrentUser() user: JwtUser) {
     return this.engagementService.getContinueWatching(user);
+  }
+
+  @Get('recommendations')
+  getRecommendations(@CurrentUser() user: JwtUser, @Query() query: GetRecommendationsDto) {
+    return this.engagementService.getRecommendations(user, query);
   }
 
   @Post('watch/progress')

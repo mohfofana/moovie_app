@@ -186,6 +186,7 @@ A backend skeleton is now available in `server/` with NestJS + Prisma.
 - `POST /api/my-list/:titleId?type=movie|tv`
 - `DELETE /api/my-list/:titleId`
 - `GET /api/watch/continue`
+- `GET /api/recommendations?type=movie|tv&limit=20`
 - `POST /api/watch/progress`
 - `POST /api/interactions`
 
