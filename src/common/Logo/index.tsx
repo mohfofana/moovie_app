@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-import logo from "@/assets/svg/tmovie.svg";
+import logo from "@/assets/svg/cinescope.svg";
 import { cn } from "@/utils/helper";
 
 interface logoProps {
