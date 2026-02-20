@@ -1,0 +1,141 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TitleType {
+  movie
+  tv
+}
+
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  passwordHash  String
+  createdAt     DateTime       @default(now())
+  profiles      Profile[]
+  refreshTokens RefreshToken[]
+}
+
+model Profile {
+  id            String         @id @default(cuid())
+  userId        String
+  name          String
+  avatar        String?
+  maturityLimit Int            @default(18)
+  language      String         @default("en")
+  isKid         Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  watchHistory  WatchHistory[]
+  myList        MyList[]
+  interactions  Interaction[]
+
+  @@index([userId])
+}
+
+model Title {
+  id            String         @id @default(cuid())
+  tmdbId        Int
+  type          TitleType
+  title         String
+  synopsis      String?
+  metadataJson  Json?
+  poster        String?
+  backdrop      String?
+  releaseDate   DateTime?
+  popularity    Float?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  seasons       Season[]
+  watchHistory  WatchHistory[]
+  myList        MyList[]
+  interactions  Interaction[]
+
+  @@unique([tmdbId, type])
+}
+
+model Season {
+  id           String    @id @default(cuid())
+  titleId      String
+  seasonNumber Int
+  name         String
+  title        Title     @relation(fields: [titleId], references: [id], onDelete: Cascade)
+  episodes     Episode[]
+  watchHistory WatchHistory[]
+
+  @@index([titleId])
+  @@unique([titleId, seasonNumber])
+}
+
+model Episode {
+  id            String    @id @default(cuid())
+  seasonId       String
+  episodeNumber  Int
+  name           String
+  runtime        Int?
+  season         Season    @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+  watchHistory   WatchHistory[]
+
+  @@index([seasonId])
+  @@unique([seasonId, episodeNumber])
+}
+
+model WatchHistory {
+  id              String    @id @default(cuid())
+  profileId        String
+  titleId          String
+  seasonId         String?
+  episodeId        String?
+  progressSeconds  Int       @default(0)
+  completed        Boolean   @default(false)
+  updatedAt        DateTime  @updatedAt
+  profile          Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  title            Title     @relation(fields: [titleId], references: [id], onDelete: Cascade)
+  season           Season?   @relation(fields: [seasonId], references: [id], onDelete: SetNull)
+  episode          Episode?  @relation(fields: [episodeId], references: [id], onDelete: SetNull)
+
+  @@index([profileId])
+  @@index([titleId])
+}
+
+model MyList {
+  id         String    @id @default(cuid())
+  profileId  String
+  titleId    String
+  createdAt  DateTime  @default(now())
+  profile    Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  title      Title     @relation(fields: [titleId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, titleId])
+  @@index([profileId])
+}
+
+model Interaction {
+  id         String    @id @default(cuid())
+  profileId  String
+  titleId    String
+  liked      Boolean?
+  viewedAt   DateTime?
+  profile    Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  title      Title     @relation(fields: [titleId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+  @@index([titleId])
+}
+
+model RefreshToken {
+  id         String    @id @default(cuid())
+  userId     String
+  tokenHash  String
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime  @default(now())
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}

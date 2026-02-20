@@ -162,3 +162,60 @@ Thank you for your contribution to Movie app project! We appreciate your efforts
 UI/UX design adapted from Tuat Tran Anh's tutorial.
 
 - Tutorial: [Responsive React Movies App With API | ReactJS Movies | ReactJS Tutorial](https://youtu.be/ntYXj9W1Ez8?si=ddwD3FZ6sot_NX9K)
+
+## Backend API (Sprint 1)
+
+A backend skeleton is now available in `server/` with NestJS + Prisma.
+
+### Included endpoints
+
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `POST /api/auth/refresh`
+- `POST /api/auth/logout`
+- `GET /api/auth/me`
+- `POST /api/auth/select-profile`
+- `GET /api/profiles`
+- `POST /api/profiles`
+- `PATCH /api/profiles/:id`
+- `DELETE /api/profiles/:id`
+- `GET /api/titles/trending`
+- `GET /api/titles/search?q=...`
+- `GET /api/titles/:tmdbId?type=movie|tv`
+- `GET /api/my-list`
+- `POST /api/my-list/:titleId?type=movie|tv`
+- `DELETE /api/my-list/:titleId`
+- `GET /api/watch/continue`
+- `POST /api/watch/progress`
+- `POST /api/interactions`
+
+### Run backend
+
+1. Go to backend folder:
+
+```bash
+cd server
+```
+
+2. Create env from template:
+
+```bash
+# Windows (PowerShell)
+Copy-Item .env.example .env
+
+# macOS/Linux
+cp .env.example .env
+```
+
+3. Run Prisma migration and generate client:
+
+```bash
+npm run prisma:migrate
+npm run prisma:generate
+```
+
+4. Start backend:
+
+```bash
+npm run start:dev
+```
