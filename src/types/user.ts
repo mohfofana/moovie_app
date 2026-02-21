@@ -27,8 +27,8 @@ export interface LoginCredentials {
 
 export interface SignupCredentials {
   email: string;
-  username: string;
   password: string;
+  profileName?: string;
 }
 
 export interface WatchlistItem {

@@ -6,38 +6,24 @@ export const recommendationService = {
    * Get personalized recommendations based on user activity
    */
   async getPersonalizedRecommendations(limit: number = 20): Promise<Recommendation[]> {
-    const { data } = await apiClient.get<Recommendation[]>('/recommendations', {
-      params: { limit },
-    });
+    const { data } = await apiClient.get<Recommendation[]>('/recommendations');
     return data;
   },
 
   /**
-   * Get recommendations for a specific title (similar titles)
+   * Get trending titles (uses /titles/trending endpoint)
    */
-  async getSimilarTitles(titleId: number, titleType: 'movie' | 'tv', limit: number = 10): Promise<Recommendation[]> {
-    const { data } = await apiClient.get<Recommendation[]>(`/recommendations/similar/${titleId}`, {
-      params: { titleType, limit },
-    });
+  async getTrending(limit: number = 20): Promise<any[]> {
+    const { data } = await apiClient.get<any[]>('/titles/trending');
     return data;
   },
 
   /**
-   * Get trending recommendations
+   * Search titles
    */
-  async getTrending(limit: number = 20): Promise<Recommendation[]> {
-    const { data } = await apiClient.get<Recommendation[]>('/recommendations/trending', {
-      params: { limit },
-    });
-    return data;
-  },
-
-  /**
-   * Get recommendations by genre
-   */
-  async getByGenre(genreId: number, limit: number = 20): Promise<Recommendation[]> {
-    const { data } = await apiClient.get<Recommendation[]>(`/recommendations/genre/${genreId}`, {
-      params: { limit },
+  async searchTitles(query: string, limit: number = 20): Promise<any[]> {
+    const { data } = await apiClient.get<any[]>('/titles/search', {
+      params: { query, limit },
     });
     return data;
   },

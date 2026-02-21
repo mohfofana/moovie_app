@@ -10,6 +10,8 @@ import {
   Loader,
 } from "@/common";
 
+import { ProtectedRoute } from "@/components";
+
 import "react-loading-skeleton/dist/skeleton.css";
 import "swiper/css";
 
@@ -17,6 +19,13 @@ const Catalog = lazy(() => import("./pages/Catalog"));
 const Home = lazy(() => import("./pages/Home"));
 const Detail = lazy(() => import("./pages/Detail"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const Login = lazy(() => import("./pages/Auth/Login"));
+const Signup = lazy(() => import("./pages/Auth/Signup"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Watchlist = lazy(() => import("./pages/Watchlist"));
+const Favorites = lazy(() => import("./pages/Favorites"));
+const Recommendations = lazy(() => import("./pages/Recommendations"));
+const History = lazy(() => import("./pages/History"));
 
 const App = () => {
   return (
@@ -29,6 +38,13 @@ const App = () => {
           <Suspense fallback={<Loader />}>
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+              <Route path="/watchlist" element={<ProtectedRoute><Watchlist /></ProtectedRoute>} />
+              <Route path="/favorites" element={<ProtectedRoute><Favorites /></ProtectedRoute>} />
+              <Route path="/recommendations" element={<ProtectedRoute><Recommendations /></ProtectedRoute>} />
+              <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
               <Route path="/:category/:id" element={<Detail />} />
               <Route path="/:category" element={<Catalog />} />
               <Route path="*" element={<NotFound />} />

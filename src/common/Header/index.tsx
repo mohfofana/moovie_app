@@ -8,6 +8,8 @@ import throttle from "lodash.throttle";
 
 import { ThemeMenu, Logo } from "..";
 import HeaderNavItem from "./HeaderNavItem";
+import SearchBar from "../SearchBar";
+import UserMenu from "../UserMenu";
 
 import { useGlobalContext } from "@/context/globalContext";
 import { useTheme } from "@/context/themeContext";
@@ -92,6 +94,8 @@ const Header = () => {
             })}
           </ul>
 
+          <SearchBar />
+
           <div className="button relative">
             <button
               name="theme-menu"
@@ -111,6 +115,8 @@ const Header = () => {
               {showThemeOptions && <ThemeMenu />}
             </AnimatePresence>
           </div>
+
+          <UserMenu isNotFoundPage={isNotFoundPage} showBg={isActive} />
         </div>
 
         <button

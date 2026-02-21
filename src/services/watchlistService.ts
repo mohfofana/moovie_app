@@ -3,10 +3,10 @@ import type { WatchlistItem, FavoriteItem } from '@/types/user';
 
 export const watchlistService = {
   /**
-   * Get user's watchlist
+   * Get user's watchlist (my-list)
    */
   async getWatchlist(): Promise<WatchlistItem[]> {
-    const { data } = await apiClient.get<WatchlistItem[]>('/watchlist');
+    const { data } = await apiClient.get<WatchlistItem[]>('/my-list');
     return data;
   },
 
@@ -14,59 +14,61 @@ export const watchlistService = {
    * Add title to watchlist
    */
   async addToWatchlist(titleId: number, titleType: 'movie' | 'tv'): Promise<WatchlistItem> {
-    const { data } = await apiClient.post<WatchlistItem>('/watchlist', {
-      titleId,
-      titleType,
-    });
+    const { data } = await apiClient.post<WatchlistItem>(`/my-list/${titleId}?type=${titleType}`);
     return data;
   },
 
   /**
    * Remove title from watchlist
    */
-  async removeFromWatchlist(id: string): Promise<void> {
-    await apiClient.delete(`/watchlist/${id}`);
+  async removeFromWatchlist(titleId: string): Promise<void> {
+    await apiClient.delete(`/my-list/${titleId}`);
   },
 
   /**
    * Check if title is in watchlist
    */
   async isInWatchlist(titleId: number): Promise<boolean> {
-    const { data } = await apiClient.get<{ inWatchlist: boolean }>(`/watchlist/check/${titleId}`);
-    return data.inWatchlist;
+    try {
+      const watchlist = await this.getWatchlist();
+      return watchlist.some(item => item.titleId === titleId);
+    } catch {
+      return false;
+    }
   },
 
   /**
-   * Get user's favorites
+   * Get user's favorites (same as watchlist for now)
    */
   async getFavorites(): Promise<FavoriteItem[]> {
-    const { data } = await apiClient.get<FavoriteItem[]>('/favorites');
+    const { data } = await apiClient.get<FavoriteItem[]>('/my-list');
     return data;
   },
 
   /**
-   * Add title to favorites
+   * Add title to favorites (same as watchlist)
    */
   async addToFavorites(titleId: number, titleType: 'movie' | 'tv'): Promise<FavoriteItem> {
-    const { data} = await apiClient.post<FavoriteItem>('/favorites', {
-      titleId,
-      titleType,
-    });
+    const { data } = await apiClient.post<FavoriteItem>(`/my-list/${titleId}?type=${titleType}`);
     return data;
   },
 
   /**
    * Remove title from favorites
    */
-  async removeFromFavorites(id: string): Promise<void> {
-    await apiClient.delete(`/favorites/${id}`);
+  async removeFromFavorites(titleId: string): Promise<void> {
+    await apiClient.delete(`/my-list/${titleId}`);
   },
 
   /**
    * Check if title is favorited
    */
   async isFavorited(titleId: number): Promise<boolean> {
-    const { data } = await apiClient.get<{ isFavorited: boolean }>(`/favorites/check/${titleId}`);
-    return data.isFavorited;
+    try {
+      const favorites = await this.getFavorites();
+      return favorites.some(item => item.titleId === titleId);
+    } catch {
+      return false;
+    }
   },
 };

@@ -20,7 +20,7 @@ export const authService = {
    * Register new user
    */
   async signup(credentials: SignupCredentials): Promise<AuthResponse> {
-    const { data } = await apiClient.post<AuthResponse>('/auth/signup', credentials);
+    const { data } = await apiClient.post<AuthResponse>('/auth/register', credentials);
 
     // Store tokens and user
     localStorage.setItem('accessToken', data.accessToken);
