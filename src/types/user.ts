@@ -33,16 +33,19 @@ export interface SignupCredentials {
 
 export interface WatchlistItem {
   id: string;
-  userId: string;
-  titleId: number;
-  titleType: 'movie' | 'tv';
-  addedAt: string;
-  title?: {
-    id: number;
+  profileId: string;
+  titleId: string;
+  createdAt: string;
+  title: {
+    id: string;
+    tmdbId: number;
+    type: 'movie' | 'tv';
     title: string;
-    posterPath: string;
-    releaseDate?: string;
-    voteAverage?: number;
+    synopsis: string | null;
+    poster: string | null;
+    backdrop: string | null;
+    releaseDate: string | null;
+    popularity: number | null;
   };
 }
 

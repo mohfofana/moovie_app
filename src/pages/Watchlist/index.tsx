@@ -6,6 +6,7 @@ import { watchlistService } from '@/services/watchlistService';
 import type { WatchlistItem } from '@/types/user';
 import { Loader } from '@/common';
 import { cn } from '@/utils/helper';
+import { IMG_URL } from '@/utils/config';
 
 const Watchlist = () => {
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>([]);
@@ -28,9 +29,9 @@ const Watchlist = () => {
     fetchWatchlist();
   }, []);
 
-  const handleRemove = async (titleId: number) => {
+  const handleRemove = async (titleId: string) => {
     try {
-      await watchlistService.removeFromWatchlist(titleId.toString());
+      await watchlistService.removeFromWatchlist(titleId);
       setWatchlist(prev => prev.filter(item => item.titleId !== titleId));
     } catch (err: any) {
       console.error('Failed to remove from watchlist:', err);
@@ -125,16 +126,33 @@ const Watchlist = () => {
                   <HiX className="text-white text-lg" />
                 </button>
 
-                {/* Note: MovieCard component would need to be updated to accept watchlist data */}
+                {/* Title Card */}
                 <div
-                  onClick={() => navigate(`/${item.titleType}/${item.titleId}`)}
+                  onClick={() => navigate(`/${item.title.type}/${item.title.tmdbId}`)}
                   className="cursor-pointer"
                 >
-                  <div className="aspect-[2/3] bg-white/5 rounded-lg overflow-hidden border border-white/10">
-                    {/* Placeholder - Replace with actual movie data */}
-                    <div className="w-full h-full flex items-center justify-center">
-                      <HiBookmark className="text-gray-600 text-4xl" />
-                    </div>
+                  <div className="aspect-[2/3] bg-white/5 rounded-lg overflow-hidden border border-white/10 group-hover:border-white/20 transition-all duration-200">
+                    {item.title.poster ? (
+                      <img
+                        src={`${IMG_URL}/w342${item.title.poster}`}
+                        alt={item.title.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
+                        <HiBookmark className="text-gray-600 text-4xl" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="mt-2">
+                    <h3 className="text-white text-sm font-medium line-clamp-2 group-hover:text-accent-cyan transition-colors">
+                      {item.title.title}
+                    </h3>
+                    {item.title.releaseDate && (
+                      <p className="text-gray-500 text-xs mt-1">
+                        {new Date(item.title.releaseDate).getFullYear()}
+                      </p>
+                    )}
                   </div>
                 </div>
               </m.div>

@@ -6,6 +6,7 @@ import { watchlistService } from '@/services/watchlistService';
 import type { FavoriteItem } from '@/types/user';
 import { Loader } from '@/common';
 import { cn } from '@/utils/helper';
+import { IMG_URL } from '@/utils/config';
 
 const Favorites = () => {
   const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
@@ -28,9 +29,9 @@ const Favorites = () => {
     fetchFavorites();
   }, []);
 
-  const handleRemove = async (titleId: number) => {
+  const handleRemove = async (titleId: string) => {
     try {
-      await watchlistService.removeFromFavorites(titleId.toString());
+      await watchlistService.removeFromFavorites(titleId);
       setFavorites(prev => prev.filter(item => item.titleId !== titleId));
     } catch (err: any) {
       console.error('Failed to remove from favorites:', err);
@@ -130,15 +131,33 @@ const Favorites = () => {
                   <HiHeart className="text-red-500 text-lg" />
                 </div>
 
+                {/* Title Card */}
                 <div
-                  onClick={() => navigate(`/${item.titleType}/${item.titleId}`)}
+                  onClick={() => navigate(`/${item.title.type}/${item.title.tmdbId}`)}
                   className="cursor-pointer"
                 >
-                  <div className="aspect-[2/3] bg-white/5 rounded-lg overflow-hidden border border-white/10">
-                    {/* Placeholder - Replace with actual movie data */}
-                    <div className="w-full h-full flex items-center justify-center">
-                      <HiHeart className="text-gray-600 text-4xl" />
-                    </div>
+                  <div className="aspect-[2/3] bg-white/5 rounded-lg overflow-hidden border border-white/10 group-hover:border-red-500/30 transition-all duration-200">
+                    {item.title.poster ? (
+                      <img
+                        src={`${IMG_URL}/w342${item.title.poster}`}
+                        alt={item.title.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
+                        <HiHeart className="text-gray-600 text-4xl" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="mt-2">
+                    <h3 className="text-white text-sm font-medium line-clamp-2 group-hover:text-red-400 transition-colors">
+                      {item.title.title}
+                    </h3>
+                    {item.title.releaseDate && (
+                      <p className="text-gray-500 text-xs mt-1">
+                        {new Date(item.title.releaseDate).getFullYear()}
+                      </p>
+                    )}
                   </div>
                 </div>
               </m.div>
