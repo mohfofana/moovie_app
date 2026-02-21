@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Loader, Error, Section, PersonalSection } from "@/common";
 import { Hero } from "./components";
+import { Link } from "react-router-dom";
 
 import { titlesService } from "@/services/titlesService";
 import { historyService } from "@/services/historyService";
@@ -14,20 +15,20 @@ import type { IMovie } from "@/types";
 import type { WatchHistory, Recommendation } from "@/types/user";
 
 interface MovieWithVideos {
-  id: number;
+  id: string;
   title?: string;
-  name?: string;
+  name: string;
   overview: string;
   poster_path: string;
   backdrop_path: string;
-  original_title?: string;
+  original_title: string;
   videos?: {
     results: Array<{
       id: string;
       key: string;
       name: string;
       type: string;
-      site: string;
+      site?: string;
     }>;
   };
 }
@@ -77,13 +78,17 @@ const Home = () => {
               return {
                 ...movie,
                 ...details,
-                original_title: details.title || details.name || movie.title,
+                id: String(movie.id),
+                name: details.name || details.title || movie.name || movie.title || '',
+                original_title: details.title || details.name || movie.title || '',
               };
             } catch (err) {
               // If details fail, return movie without videos
               return {
                 ...movie,
-                original_title: movie.title,
+                id: String(movie.id),
+                name: movie.name || movie.title || '',
+                original_title: movie.title || '',
               };
             }
           })
@@ -201,6 +206,40 @@ const Home = () => {
             key={`${category}_${type}`}
           />
         ))}
+
+        <div className="mt-4 mb-10 rounded-[18px] border border-[rgba(255,255,255,0.1)] bg-[linear-gradient(120deg,rgba(145,35,35,0.48),rgba(64,16,16,0.62))] p-6 sm:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="max-w-[760px]">
+            <h3 className="font-roboto text-[34px] sm:text-[42px] text-[#f5f1f1] leading-[1.05]">
+              Un film ou une serie te manque ?
+            </h3>
+            <p className="text-[#ead3d3] text-[17px] mt-3">
+              Propose-le sur notre wishlist et vote pour les demandes de la communaute.
+            </p>
+          </div>
+          <Link
+            to="/catalogue"
+            className="inline-flex items-center justify-center px-6 py-3 rounded-2xl bg-white/15 hover:bg-white/25 border border-white/20 text-white font-semibold"
+          >
+            Voir le Wishlist
+          </Link>
+        </div>
+
+        <div className="mb-12 rounded-[18px] border border-[rgba(255,255,255,0.1)] bg-[linear-gradient(120deg,rgba(38,26,26,0.88),rgba(20,13,13,0.82))] p-6 sm:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="max-w-[760px]">
+            <h3 className="font-roboto text-[32px] sm:text-[38px] text-[#f5f1f1] leading-[1.05]">
+              Un souci, une question ? Rejoins le Discord
+            </h3>
+            <p className="text-[#cbbdbd] text-[17px] mt-3">
+              Mises a jour, infos importantes, support et nouveautes en temps reel.
+            </p>
+          </div>
+          <a
+            href="#"
+            className="inline-flex items-center justify-center px-6 py-3 rounded-2xl bg-[#5865f2] hover:bg-[#6874ff] text-white font-semibold"
+          >
+            Notre Discord
+          </a>
+        </div>
       </div>
     </>
   );

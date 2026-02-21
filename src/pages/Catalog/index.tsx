@@ -1,12 +1,11 @@
-import { useState, useEffect } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useState, useEffect } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
 
-
-import { MovieCard, SkelatonLoader } from "@/common";
-import { CatalogHeader, Search } from "./components";
-import { useGetShowsQuery } from "@/services/TMDB";
-import { smallMaxWidth } from "@/styles";
-import { IMovie } from "@/types";
+import { MovieCard, SkelatonLoader } from '@/common';
+import { CatalogHeader, Search } from './components';
+import { useGetShowsQuery } from '@/services/TMDB';
+import { smallMaxWidth } from '@/styles';
+import { IMovie } from '@/types';
 
 const Catalog = () => {
   const [page, setPage] = useState(1);
@@ -15,8 +14,8 @@ const Catalog = () => {
   const [query, setQuery] = useSearchParams();
   const { category } = useParams();
 
-  const type = query.get("type") || "popular";
-  const searchQuery = query.get("search") || "";
+  const type = query.get('type') || 'popular';
+  const searchQuery = query.get('search') || '';
 
   const { data, isLoading, isFetching } = useGetShowsQuery({
     category,
@@ -46,26 +45,25 @@ const Catalog = () => {
   return (
     <>
       <CatalogHeader category={String(category)} />
-      <section className={`${smallMaxWidth} `}>
-        <Search setQuery={setQuery}/>
+      <section className={`${smallMaxWidth}`}>
+        <Search setQuery={setQuery} />
 
-        {isLoading || isCategoryChanged ? (
-          <SkelatonLoader isMoviesSliderLoader={false} />
-        ) : (
-          <div
-          
-            className="flex flex-wrap xs:gap-4 gap-[14px] justify-center"
-          >
-            {shows?.map((movie) => (
-              <div
-                key={movie.id}
-                className="flex flex-col xs:gap-4 gap-2 xs:max-w-[170px] max-w-[124px] rounded-lg lg:mb-6 md:mb-5 sm:mb-4 mb-[10px]"
-              >
-                <MovieCard movie={movie} category={String(category)} />
-              </div>
-            ))}
-          </div>
-        )}
+        <div className="rounded-[18px] border border-white/10 bg-[linear-gradient(145deg,rgba(33,12,12,0.72),rgba(18,8,8,0.52))] p-4 sm:p-6">
+          {isLoading || isCategoryChanged ? (
+            <SkelatonLoader isMoviesSliderLoader={false} />
+          ) : (
+            <div className="flex flex-wrap xs:gap-4 gap-[14px] justify-center">
+              {shows?.map((movie) => (
+                <div
+                  key={movie.id}
+                  className="flex flex-col xs:gap-4 gap-2 xs:max-w-[170px] max-w-[124px] rounded-lg lg:mb-6 md:mb-5 sm:mb-4 mb-[10px]"
+                >
+                  <MovieCard movie={movie} category={String(category)} />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
         {isFetching && !isCategoryChanged ? (
           <SkelatonLoader
@@ -80,7 +78,7 @@ const Catalog = () => {
                 setPage(page + 1);
               }}
               disabled={isFetching}
-              className="sm:py-2 xs:py-[6px] py-1 sm:px-4 xs:px-3 px-[10.75px] bg-[#ff0000] text-gray-50 rounded-full md:text-[15.25px] sm:text-[14.75px] xs:text-[14px] text-[12.75px] shadow-md hover:-translate-y-1 transition-all duration-300 font-medium font-nunito lg:my-8 my-7"
+              className="sm:py-3 xs:py-[8px] py-2 sm:px-6 xs:px-5 px-[14px] bg-[#d93a3a] text-gray-50 rounded-2xl md:text-[15.25px] sm:text-[14.75px] xs:text-[14px] text-[12.75px] shadow-md hover:bg-[#e14949] transition-all duration-300 font-semibold font-nunito lg:my-8 my-7"
             >
               Load more
             </button>

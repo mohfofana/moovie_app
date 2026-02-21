@@ -11,7 +11,7 @@ interface MovieWithVideos extends IMovie {
       key: string;
       name: string;
       type: string;
-      site: string;
+      site?: string;
     }>;
   };
 }
@@ -19,7 +19,7 @@ interface MovieWithVideos extends IMovie {
 const Hero = ({ movies }: { movies: MovieWithVideos[] }) => {
   return (
     <Swiper
-      className="mySwiper lg:h-screen sm:h-[700px] xs:h-[560px] h-[500px] w-full"
+      className="mySwiper lg:h-[860px] sm:h-[760px] xs:h-[680px] h-[620px] w-full"
       loop={true}
       slidesPerView={1}
       autoplay={{

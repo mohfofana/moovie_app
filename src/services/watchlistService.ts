@@ -31,7 +31,7 @@ export const watchlistService = {
   async isInWatchlist(titleId: number): Promise<boolean> {
     try {
       const watchlist = await this.getWatchlist();
-      return watchlist.some(item => item.titleId === titleId);
+      return watchlist.some(item => Number(item.titleId) === titleId);
     } catch {
       return false;
     }
@@ -66,7 +66,7 @@ export const watchlistService = {
   async isFavorited(titleId: number): Promise<boolean> {
     try {
       const favorites = await this.getFavorites();
-      return favorites.some(item => item.titleId === titleId);
+      return favorites.some(item => Number(item.titleId) === titleId);
     } catch {
       return false;
     }

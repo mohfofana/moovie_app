@@ -1,5 +1,4 @@
 import { NavLink } from "react-router-dom";
-import { textColor } from "../../styles";
 import { cn } from "../../utils/helper";
 
 interface HeaderProps {
@@ -17,11 +16,11 @@ const HeaderNavItem = ({ link, showBg, isNotFoundPage }: HeaderProps) => {
           return cn(
             "nav-link",
             isActive
-              ? ` active ${showBg ? textColor : `text-secColor`}`
+              ? "active text-white"
               : ` ${
                   isNotFoundPage || showBg
-                    ? "text-[#444] dark:text-gray-300 dark:hover:text-secColor hover:text-black"
-                    : "text-gray-300 hover:text-secColor"
+                    ? "text-gray-300 hover:text-white"
+                    : "text-gray-300 hover:text-white"
                 }`
           );
         }}

@@ -95,7 +95,7 @@ const Header = () => {
           )}
         />
 
-        <div className="hidden md:flex flex-row gap-12 items-center text-gray-700 dark:text-gray-400">
+        <div className="hidden md:flex flex-row gap-8 items-center text-gray-700 dark:text-gray-300">
           <ul className="flex flex-row gap-8 text-[14px] font-medium">
             {translatedNavLinks.map((link: { title: string; path: string }) => {
               return (
@@ -118,7 +118,7 @@ const Header = () => {
               onClick={openMenu}
               id="theme"
               className={cn(
-                `flex items-center justify-center rounded-full p-2 transition-all duration-200 hover:bg-white/10`,
+                `flex items-center justify-center rounded-2xl px-3 py-[10px] transition-all duration-200 bg-white/5 hover:bg-white/10 border border-white/10`,
                 isNotFoundPage || isActive
                   ? `text-gray-700 dark:text-white`
                   : `text-white/90`
@@ -135,7 +135,7 @@ const Header = () => {
             type="button"
             onClick={() => setLocale(locale === 'fr' ? 'en' : 'fr')}
             className={cn(
-              `px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 hover:bg-white/10`,
+              `px-3 py-[10px] rounded-2xl text-xs font-semibold transition-all duration-200 bg-white/5 hover:bg-white/10 border border-white/10`,
               isNotFoundPage || isActive
                 ? `text-gray-700 dark:text-white`
                 : `text-white/90`

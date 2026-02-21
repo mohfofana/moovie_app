@@ -40,8 +40,8 @@ const UserMenu = ({ isNotFoundPage, showBg }: UserMenuProps) => {
       <Link
         to="/login"
         className={cn(
-          'px-5 py-2 rounded-full font-medium text-[14px] transition-all duration-200',
-          'bg-white text-black hover:bg-gray-100'
+          'px-5 py-3 rounded-2xl font-medium text-[14px] transition-all duration-200',
+          'bg-white/10 text-white hover:bg-white/15 border border-white/10'
         )}
       >
         Sign In
@@ -72,8 +72,7 @@ const UserMenu = ({ isNotFoundPage, showBg }: UserMenuProps) => {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          'flex items-center gap-2 p-1.5 rounded-full transition-all duration-200',
-          'hover:bg-white/10',
+          'flex items-center gap-2 px-3 py-[10px] rounded-2xl transition-all duration-200 bg-white/8 hover:bg-white/12 border border-white/10',
           isNotFoundPage || showBg ? 'text-gray-700 dark:text-white' : 'text-white/90'
         )}
       >
@@ -88,6 +87,7 @@ const UserMenu = ({ isNotFoundPage, showBg }: UserMenuProps) => {
             {user?.username?.charAt(0).toUpperCase() || 'U'}
           </div>
         )}
+        <span className="text-[15px] font-semibold pr-1 hidden lg:inline">Moi</span>
       </button>
 
       {/* Dropdown Menu */}

@@ -29,18 +29,12 @@ const SearchBar = () => {
   const navigate = useNavigate();
 
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
 
-  // Debounce search query
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedQuery(searchQuery);
-    }, 300);
-
+    const timer = setTimeout(() => setDebouncedQuery(searchQuery), 300);
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Fetch search results
   useEffect(() => {
     const fetchResults = async () => {
       if (debouncedQuery.length < 2) {
@@ -48,9 +42,7 @@ const SearchBar = () => {
         return;
       }
 
-      setIsSearching(true);
       try {
-        // Search without type filter to get both movies and TV shows
         const response = await titlesService.search(debouncedQuery);
         const results = response.results.slice(0, 6).map((item: SearchResult) => ({
           ...item,
@@ -58,20 +50,13 @@ const SearchBar = () => {
         }));
         setSearchResults(results);
       } catch (error) {
-        console.error('Search error:', error);
         setSearchResults([]);
-      } finally {
-        setIsSearching(false);
       }
     };
 
     fetchResults();
   }, [debouncedQuery]);
 
-  // Combined results
-  const combinedResults = searchResults;
-
-  // Handle click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -97,40 +82,28 @@ const SearchBar = () => {
     inputRef.current?.focus();
   };
 
-  const handleFocus = () => {
-    setIsFocused(true);
-    if (searchQuery.length >= 2) {
-      setIsOpen(true);
-    }
-  };
-
   useEffect(() => {
-    if (debouncedQuery.length >= 2) {
-      setIsOpen(true);
-    } else {
-      setIsOpen(false);
-    }
+    setIsOpen(debouncedQuery.length >= 2);
   }, [debouncedQuery]);
 
   return (
     <div ref={searchRef} className="relative">
-      {/* Search Input */}
       <div
         className={cn(
-          'flex items-center gap-3 px-4 py-2.5 rounded-full transition-all duration-200',
-          'bg-white/5 border border-white/10',
-          isFocused && 'bg-white/8 border-white/20'
+          'flex items-center gap-3 px-5 py-3 rounded-2xl transition-all duration-200',
+          'bg-white/8 border border-white/10',
+          isFocused && 'bg-white/12 border-white/20'
         )}
       >
-        <HiSearch className="text-gray-400 text-[18px] flex-shrink-0" />
+        <HiSearch className="text-gray-300 text-[18px] flex-shrink-0" />
         <input
           ref={inputRef}
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          onFocus={handleFocus}
+          onFocus={() => setIsFocused(true)}
           placeholder={t.search.placeholder}
-          className="bg-transparent border-none outline-none text-white placeholder-gray-500 text-[14px] w-[200px] xl:w-[260px]"
+          className="bg-transparent border-none outline-none text-white placeholder-gray-300 text-[14px] w-[160px] xl:w-[200px]"
         />
         {searchQuery && (
           <button
@@ -143,9 +116,8 @@ const SearchBar = () => {
         )}
       </div>
 
-      {/* Search Results Dropdown */}
       <AnimatePresence>
-        {isOpen && combinedResults.length > 0 && (
+        {isOpen && searchResults.length > 0 && (
           <m.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -154,13 +126,13 @@ const SearchBar = () => {
             className="absolute top-full mt-2 w-full min-w-[320px] dark-glass rounded-2xl overflow-hidden border border-white/10"
           >
             <div className="max-h-[400px] overflow-y-auto">
-              {combinedResults.map((result: SearchResult) => {
+              {searchResults.map((result: SearchResult) => {
                 const title = result.title || result.name || 'Unknown';
                 const imageUrl = result.poster_path
                   ? `${IMG_URL}/w185${result.poster_path}`
                   : result.backdrop_path
-                  ? `${IMG_URL}/w300${result.backdrop_path}`
-                  : null;
+                    ? `${IMG_URL}/w300${result.backdrop_path}`
+                    : null;
 
                 return (
                   <button
@@ -180,19 +152,15 @@ const SearchBar = () => {
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-white text-sm font-medium truncate">
-                        {title}
-                      </h4>
+                      <h4 className="text-white text-sm font-medium truncate">{title}</h4>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="text-gray-400 text-xs capitalize">
                           {result.media_type === 'movie' ? t.search.movie : t.search.tvShow}
                         </span>
                         {result.vote_average && result.vote_average > 0 && (
                           <>
-                            <span className="text-gray-600">•</span>
-                            <span className="text-gray-400 text-xs">
-                              ★ {result.vote_average.toFixed(1)}
-                            </span>
+                            <span className="text-gray-600">-</span>
+                            <span className="text-gray-400 text-xs">* {result.vote_average.toFixed(1)}</span>
                           </>
                         )}
                       </div>
@@ -201,22 +169,6 @@ const SearchBar = () => {
                 );
               })}
             </div>
-
-            {/* View All Results */}
-            {debouncedQuery && (
-              <div className="border-t border-white/10 p-3">
-                <button
-                  onClick={() => {
-                    navigate(`/search?q=${encodeURIComponent(debouncedQuery)}`);
-                    setIsOpen(false);
-                    setSearchQuery('');
-                  }}
-                  className="text-accent-cyan text-sm hover:underline"
-                >
-                  {t.search.viewAll} "{debouncedQuery}"
-                </button>
-              </div>
-            )}
           </m.div>
         )}
       </AnimatePresence>
