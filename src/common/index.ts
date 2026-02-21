@@ -13,6 +13,7 @@ import Section from "./Section";
 import SearchBar from "./SearchBar";
 import UserMenu from "./UserMenu";
 import VideoBackground from "./VideoBackground";
+import PersonalSection from "./PersonalSection";
 
 export {
   Footer,
@@ -31,4 +32,5 @@ export {
   SearchBar,
   UserMenu,
   VideoBackground,
+  PersonalSection,
 };
