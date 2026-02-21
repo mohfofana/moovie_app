@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import { Poster, Loader, Error, Section } from "@/common";
 import { Casts, Videos, Genre } from "./components";
 
-import { useGetShowQuery } from "@/services/TMDB";
+import { titlesService, type TitleDetails } from "@/services/titlesService";
 import { useMotion } from "@/hooks/useMotion";
 import { mainHeading, maxWidth, paragraph } from "@/styles";
 import { cn } from "@/utils/helper";
@@ -13,17 +13,33 @@ import { cn } from "@/utils/helper";
 const Detail = () => {
   const { category, id } = useParams();
   const [show, setShow] = useState<Boolean>(false);
+  const [movie, setMovie] = useState<TitleDetails | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
   const { fadeDown, staggerContainer } = useMotion();
 
-  const {
-    data: movie,
-    isLoading,
-    isFetching,
-    isError,
-  } = useGetShowQuery({
-    category: String(category),
-    id: Number(id),
-  });
+  // Fetch movie/show details
+  useEffect(() => {
+    const fetchDetails = async () => {
+      if (!id || !category) return;
+
+      setIsLoading(true);
+      setIsError(false);
+
+      try {
+        const type = category === 'movie' ? 'movie' : 'tv';
+        const data = await titlesService.getDetails(Number(id), type);
+        setMovie(data);
+      } catch (error) {
+        console.error('Failed to fetch title details:', error);
+        setIsError(true);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDetails();
+  }, [id, category]);
 
   useEffect(() => {
     document.title =
@@ -38,11 +54,11 @@ const Detail = () => {
 
   const toggleShow = () => setShow((prev) => !prev);
 
-  if (isLoading || isFetching) {
+  if (isLoading) {
     return <Loader />;
   }
 
-  if (isError) {
+  if (isError || !movie) {
     return <Error error="Something went wrong!" />;
   }
 

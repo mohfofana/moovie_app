@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { m } from 'framer-motion';
 import { HiCamera, HiPencil, HiCheck, HiX } from 'react-icons/hi';
 import { useAuth } from '@/context/authContext';
@@ -13,6 +13,8 @@ const Profile = () => {
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
@@ -42,6 +44,55 @@ const Profile = () => {
     });
     setIsEditing(false);
     setError('');
+  };
+
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setError('Please select an image file');
+      return;
+    }
+
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      setError('Image size must be less than 2MB');
+      return;
+    }
+
+    setIsUploadingAvatar(true);
+    setError('');
+
+    try {
+      // Convert to base64
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        try {
+          const base64String = reader.result as string;
+          await updateUser({ avatar: base64String });
+          setSuccess('Avatar updated successfully');
+          setTimeout(() => setSuccess(''), 3000);
+        } catch (err: any) {
+          setError(err.response?.data?.message || 'Failed to upload avatar');
+        } finally {
+          setIsUploadingAvatar(false);
+        }
+      };
+      reader.onerror = () => {
+        setError('Failed to read file');
+        setIsUploadingAvatar(false);
+      };
+      reader.readAsDataURL(file);
+    } catch (err: any) {
+      setError('Failed to upload avatar');
+      setIsUploadingAvatar(false);
+    }
   };
 
   return (
@@ -91,11 +142,23 @@ const Profile = () => {
                 </div>
               )}
               <button
-                className="absolute bottom-0 right-0 bg-white text-black p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                onClick={handleAvatarClick}
+                disabled={isUploadingAvatar}
+                className={cn(
+                  "absolute bottom-0 right-0 bg-white text-black p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg",
+                  isUploadingAvatar && "opacity-50 cursor-not-allowed"
+                )}
                 aria-label="Change avatar"
               >
                 <HiCamera size={16} />
               </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarUpload}
+                className="hidden"
+              />
             </div>
 
             <div className="flex-1">

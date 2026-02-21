@@ -57,9 +57,16 @@ export const authService = {
    * Update user profile
    */
   async updateProfile(updates: Partial<User>): Promise<User> {
-    const { data } = await apiClient.patch<User>('/auth/profile', updates);
+    const { data } = await apiClient.patch<User>('/auth/me', updates);
     localStorage.setItem('user', JSON.stringify(data));
     return data;
+  },
+
+  /**
+   * Update user (alias for updateProfile for consistency)
+   */
+  async updateUser(updates: Partial<User>): Promise<User> {
+    return this.updateProfile(updates);
   },
 
   /**

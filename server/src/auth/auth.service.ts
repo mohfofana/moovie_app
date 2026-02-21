@@ -11,6 +11,7 @@ import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 const ACCESS_TOKEN_TTL = '15m';
 const REFRESH_TOKEN_TTL_DAYS = 30;
@@ -145,6 +146,47 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
+
+    return user;
+  }
+
+  async updateUser(userId: string, dto: UpdateUserDto) {
+    // Check if email is being changed and if it's already in use
+    if (dto.email) {
+      const existing = await this.prisma.user.findUnique({
+        where: { email: dto.email.toLowerCase() },
+        select: { id: true },
+      });
+
+      if (existing && existing.id !== userId) {
+        throw new ConflictException('Email is already in use');
+      }
+    }
+
+    const updateData: Prisma.UserUpdateInput = {};
+
+    if (dto.email) {
+      updateData.email = dto.email.toLowerCase();
+    }
+
+    if (dto.avatar !== undefined) {
+      updateData.avatar = dto.avatar;
+    }
+
+    // Note: username field doesn't exist in User model, it's in Profile
+    // If we want to update username, we should use the profiles endpoint
+
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: updateData,
+      select: {
+        id: true,
+        email: true,
+        avatar: true,
+        createdAt: true,
+        profiles: true,
+      },
+    });
 
     return user;
   }

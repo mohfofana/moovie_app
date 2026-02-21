@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { m, AnimatePresence } from 'framer-motion';
 import { HiSearch } from 'react-icons/hi';
 import { IoClose } from 'react-icons/io5';
-import { useGetShowsQuery } from '@/services/TMDB';
+import { titlesService } from '@/services/titlesService';
 import { cn } from '@/utils/helper';
 import { IMG_URL } from '@/utils/config';
 
@@ -26,6 +26,9 @@ const SearchBar = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+
   // Debounce search query
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -36,29 +39,35 @@ const SearchBar = () => {
   }, [searchQuery]);
 
   // Fetch search results
-  const { data: movieResults } = useGetShowsQuery(
-    {
-      category: 'movie',
-      searchQuery: debouncedQuery,
-      page: 1,
-    },
-    { skip: debouncedQuery.length < 2 }
-  );
+  useEffect(() => {
+    const fetchResults = async () => {
+      if (debouncedQuery.length < 2) {
+        setSearchResults([]);
+        return;
+      }
 
-  const { data: tvResults } = useGetShowsQuery(
-    {
-      category: 'tv',
-      searchQuery: debouncedQuery,
-      page: 1,
-    },
-    { skip: debouncedQuery.length < 2 }
-  );
+      setIsSearching(true);
+      try {
+        // Search without type filter to get both movies and TV shows
+        const response = await titlesService.search(debouncedQuery);
+        const results = response.results.slice(0, 6).map((item: SearchResult) => ({
+          ...item,
+          media_type: item.media_type || 'movie',
+        }));
+        setSearchResults(results);
+      } catch (error) {
+        console.error('Search error:', error);
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    };
 
-  // Combine and limit results
-  const combinedResults = [
-    ...(movieResults?.results || []).slice(0, 3).map((item: SearchResult) => ({ ...item, media_type: 'movie' })),
-    ...(tvResults?.results || []).slice(0, 3).map((item: SearchResult) => ({ ...item, media_type: 'tv' })),
-  ].slice(0, 6);
+    fetchResults();
+  }, [debouncedQuery]);
+
+  // Combined results
+  const combinedResults = searchResults;
 
   // Handle click outside
   useEffect(() => {

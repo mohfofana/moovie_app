@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Patch,
   Post,
   UnauthorizedException,
   UseGuards,
@@ -13,6 +14,7 @@ import { LoginDto } from './dto/login.dto';
 import { RefreshDto } from './dto/refresh.dto';
 import { RegisterDto } from './dto/register.dto';
 import { SelectProfileDto } from './dto/select-profile.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
@@ -43,6 +45,12 @@ export class AuthController {
   @Get('me')
   me(@CurrentUser() user: JwtUser) {
     return this.authService.getMe(user.sub);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('me')
+  updateMe(@CurrentUser() user: JwtUser, @Body() dto: UpdateUserDto) {
+    return this.authService.updateUser(user.sub, dto);
   }
 
   @UseGuards(JwtAuthGuard)

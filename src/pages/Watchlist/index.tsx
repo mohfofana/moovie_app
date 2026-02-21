@@ -4,7 +4,7 @@ import { HiX, HiBookmark } from 'react-icons/hi';
 import { useNavigate } from 'react-router-dom';
 import { watchlistService } from '@/services/watchlistService';
 import type { WatchlistItem } from '@/types/user';
-import { MovieCard, Loader } from '@/common';
+import { Loader } from '@/common';
 import { cn } from '@/utils/helper';
 
 const Watchlist = () => {
