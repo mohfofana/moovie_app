@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { m } from "framer-motion";
 import { useParams } from "react-router-dom";
+import { HiBookmark, HiHeart } from "react-icons/hi";
 
 import { Poster, Loader, Error, Section } from "@/common";
 import { Casts, Videos, Genre } from "./components";
 
 import { titlesService, type TitleDetails } from "@/services/titlesService";
+import { watchlistService } from "@/services/watchlistService";
 import { useMotion } from "@/hooks/useMotion";
 import { mainHeading, maxWidth, paragraph } from "@/styles";
 import { cn } from "@/utils/helper";
@@ -16,6 +18,10 @@ const Detail = () => {
   const [movie, setMovie] = useState<TitleDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
+  const [isInWatchlist, setIsInWatchlist] = useState(false);
+  const [isInFavorites, setIsInFavorites] = useState(false);
+  const [isAddingToWatchlist, setIsAddingToWatchlist] = useState(false);
+  const [isAddingToFavorites, setIsAddingToFavorites] = useState(false);
   const { fadeDown, staggerContainer } = useMotion();
 
   // Fetch movie/show details
@@ -30,6 +36,14 @@ const Detail = () => {
         const type = category === 'movie' ? 'movie' : 'tv';
         const data = await titlesService.getDetails(Number(id), type);
         setMovie(data);
+
+        // Check if in watchlist/favorites
+        const [inWatchlist, inFavorites] = await Promise.all([
+          watchlistService.isInWatchlist(Number(id)),
+          watchlistService.isFavorited(Number(id)),
+        ]);
+        setIsInWatchlist(inWatchlist);
+        setIsInFavorites(inFavorites);
       } catch (error) {
         console.error('Failed to fetch title details:', error);
         setIsError(true);
@@ -53,6 +67,48 @@ const Detail = () => {
   }, [movie?.title, isLoading, movie?.name]);
 
   const toggleShow = () => setShow((prev) => !prev);
+
+  const handleWatchlistToggle = async () => {
+    if (!id || !category) return;
+
+    setIsAddingToWatchlist(true);
+    try {
+      const type = category === 'movie' ? 'movie' : 'tv';
+
+      if (isInWatchlist) {
+        await watchlistService.removeFromWatchlist(id);
+        setIsInWatchlist(false);
+      } else {
+        await watchlistService.addToWatchlist(Number(id), type);
+        setIsInWatchlist(true);
+      }
+    } catch (error) {
+      console.error('Failed to update watchlist:', error);
+    } finally {
+      setIsAddingToWatchlist(false);
+    }
+  };
+
+  const handleFavoritesToggle = async () => {
+    if (!id || !category) return;
+
+    setIsAddingToFavorites(true);
+    try {
+      const type = category === 'movie' ? 'movie' : 'tv';
+
+      if (isInFavorites) {
+        await watchlistService.removeFromFavorites(id);
+        setIsInFavorites(false);
+      } else {
+        await watchlistService.addToFavorites(Number(id), type);
+        setIsInFavorites(true);
+      }
+    } catch (error) {
+      console.error('Failed to update favorites:', error);
+    } finally {
+      setIsAddingToFavorites(false);
+    }
+  };
 
   if (isLoading) {
     return <Loader />;
@@ -113,6 +169,42 @@ const Detail = () => {
                 return <Genre key={genre.id} name={genre.name} />;
               })}
             </m.ul>
+
+            {/* Action Buttons */}
+            <m.div
+              variants={fadeDown}
+              className="flex flex-row gap-3 items-center"
+            >
+              <button
+                onClick={handleWatchlistToggle}
+                disabled={isAddingToWatchlist}
+                className={cn(
+                  "flex items-center gap-2 px-5 py-3 rounded-full font-semibold text-sm transition-all duration-200",
+                  isInWatchlist
+                    ? "bg-white/90 text-black hover:bg-white"
+                    : "bg-white/10 text-white border border-white/20 hover:bg-white/20",
+                  isAddingToWatchlist && "opacity-50 cursor-not-allowed"
+                )}
+              >
+                <HiBookmark size={18} />
+                {isInWatchlist ? "In Watchlist" : "Add to Watchlist"}
+              </button>
+
+              <button
+                onClick={handleFavoritesToggle}
+                disabled={isAddingToFavorites}
+                className={cn(
+                  "flex items-center gap-2 px-5 py-3 rounded-full font-semibold text-sm transition-all duration-200",
+                  isInFavorites
+                    ? "bg-accent-magenta text-white hover:bg-accent-magenta/90"
+                    : "bg-white/10 text-white border border-white/20 hover:bg-white/20",
+                  isAddingToFavorites && "opacity-50 cursor-not-allowed"
+                )}
+              >
+                <HiHeart size={18} />
+                {isInFavorites ? "Favorited" : "Add to Favorites"}
+              </button>
+            </m.div>
 
             <m.p variants={fadeDown} className={cn(paragraph, "leading-relaxed text-gray-300")}>
               <span>
