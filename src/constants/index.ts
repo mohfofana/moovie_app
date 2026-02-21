@@ -2,6 +2,7 @@ import { BsMoonStarsFill } from "react-icons/bs";
 import { AiOutlineHome } from "react-icons/ai";
 import { TbMovie } from "react-icons/tb";
 import { MdOutlineLiveTv } from "react-icons/md";
+import { MdAnimation } from "react-icons/md";
 import { BiCollection } from "react-icons/bi";
 
 import { ITheme, INavLink } from "../types";
@@ -19,13 +20,18 @@ export const navLinks: INavLink[] = [
   },
   {
     title: "movies",
-    path: "/movie",
+    path: "/catalogues?category=movie",
     icon: TbMovie,
   },
   {
     title: "tv series",
-    path: "/tv",
+    path: "/catalogues?category=tv",
     icon: MdOutlineLiveTv,
+  },
+  {
+    title: "anime",
+    path: "/catalogues?category=anime",
+    icon: MdAnimation,
   },
 ];
 

@@ -58,18 +58,18 @@ const MovieCard = ({
 
   return (
     <div
-      className='group/card relative w-[170px]'
+      className='group/card relative w-[200px]'
       onMouseEnter={!isCompact ? onHoverStart : undefined}
       onMouseLeave={!isCompact ? onHoverEnd : undefined}
     >
       <Link
         to={`/${category}/${id}`}
-        className='rounded-[12px] relative block w-[170px] xs:h-[250px] h-[216px] overflow-hidden border border-white/10 bg-[#130909] transition-all duration-200 hover:-translate-y-1'
+        className='rounded-[12px] relative block w-[200px] xs:h-[295px] h-[255px] overflow-hidden border border-white/10 bg-[#130909] transition-all duration-200 hover:-translate-y-1'
       >
         <Image
-          height={250}
-          width={170}
-          src={`https://image.tmdb.org/t/p/original/${poster_path}`}
+          height={295}
+          width={200}
+          src={`https://image.tmdb.org/t/p/w500/${poster_path}`}
           alt={movie.original_title}
           className='object-cover rounded-[12px] w-full h-full'
           effect='zoomIn'
@@ -86,16 +86,16 @@ const MovieCard = ({
         )}
       </Link>
 
-      <h4 className='text-[#f4eaea] text-left text-[14px] font-medium leading-tight tracking-tight px-0.5 mt-2 w-[170px]'>
+      <h4 className='text-[#f4eaea] text-left text-[14px] font-medium leading-tight tracking-tight px-0.5 mt-2.5 w-[200px]'>
         {displayTitle}
       </h4>
 
       {!isCompact && (
-        <div className='pointer-events-none absolute top-0 left-0 z-30 w-[340px] opacity-0 group-hover/card:opacity-100 transition-opacity duration-200 ease-out'>
+        <div className='pointer-events-none absolute top-0 left-0 z-30 w-[380px] opacity-0 group-hover/card:opacity-100 transition-opacity duration-200 ease-out'>
           <div className='pointer-events-auto rounded-[14px] overflow-hidden border border-white/15 shadow-[0_20px_44px_rgba(0,0,0,0.65)] bg-[#403734]'>
             <Link to={`/${category}/${id}`} className='block relative h-[200px]'>
               <img
-                src={`https://image.tmdb.org/t/p/original/${poster_path}`}
+                src={`https://image.tmdb.org/t/p/w500/${poster_path}`}
                 alt={displayTitle}
                 className='w-full h-full object-cover'
               />

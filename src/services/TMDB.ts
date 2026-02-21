@@ -16,6 +16,7 @@ export const tmdbApi = createApi({
         watchProviderId,
         watchRegion,
         sortBy,
+        withGenres,
         showSimilarShows,
         id,
       }: {
@@ -26,6 +27,7 @@ export const tmdbApi = createApi({
         watchProviderId?: number;
         watchRegion?: string;
         sortBy?: string;
+        withGenres?: number;
         showSimilarShows?: boolean;
         id?: number;
       }) => {
@@ -43,10 +45,14 @@ export const tmdbApi = createApi({
           return `${category}/${id}/similar?api_key=${API_KEY}&language=${language}`;
         }
 
-        if (watchProviderId) {
+        if (watchProviderId || withGenres || sortBy) {
           const region = watchRegion || (locale === "en" ? "US" : "FR");
           const sort = sortBy || "popularity.desc";
-          return `discover/${category}?api_key=${API_KEY}&page=${page}&language=${language}&watch_region=${region}&with_watch_providers=${watchProviderId}&sort_by=${sort}`;
+          const providerPart = watchProviderId
+            ? `&with_watch_providers=${watchProviderId}`
+            : "";
+          const genresPart = withGenres ? `&with_genres=${withGenres}` : "";
+          return `discover/${category}?api_key=${API_KEY}&page=${page}&language=${language}&watch_region=${region}${providerPart}${genresPart}&sort_by=${sort}`;
         }
 
         return `${category}/${type}?api_key=${API_KEY}&page=${page}&language=${language}`;

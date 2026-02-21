@@ -56,7 +56,7 @@ const VideoBackground = ({
     <div className={cn('absolute inset-0 overflow-hidden', className)}>
       {/* Video container with aspect ratio trick */}
       {showVideo && (
-        <div className="absolute inset-0 w-full h-full">
+        <div className="absolute -inset-3 w-[calc(100%+24px)] h-[calc(100%+24px)]">
           <iframe
             src={`https://www.youtube.com/embed/${videoKey}?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&loop=1&playlist=${videoKey}&modestbranding=1&playsinline=1&enablejsapi=1&iv_load_policy=3&disablekb=1`}
             className={cn(
@@ -64,15 +64,15 @@ const VideoBackground = ({
               'min-w-full min-h-full w-auto h-auto',
               'pointer-events-none',
               'transition-opacity duration-1000',
-              // Make sure video covers the entire viewport
-              'scale-150 sm:scale-125 lg:scale-100',
+              // Overscan to avoid letterboxing/gaps on wide and tall screens
+              'scale-[1.32] sm:scale-[1.24] lg:scale-[1.18]',
               isLoaded ? 'opacity-100' : 'opacity-0'
             )}
             style={{
-              width: '100vw',
-              height: '56.25vw', // 16:9 aspect ratio (9/16 = 0.5625)
-              minHeight: '100vh',
-              minWidth: '177.77vh', // 16:9 aspect ratio (16/9 = 1.7777)
+              width: '112vw',
+              height: '63vw',
+              minHeight: '112vh',
+              minWidth: '200vh',
             }}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen

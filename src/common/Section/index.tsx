@@ -81,7 +81,7 @@ const Section: FC<SectionProps> = ({
           </Link>
         )}
       </div>
-      <div className="sm:h-[312px] xs:h-[309px] h-[266px]">
+      <div className="sm:h-[365px] xs:h-[360px] h-[315px]">
         {isLoading ? (
           <SkelatonLoader />
         ) : isError ? (

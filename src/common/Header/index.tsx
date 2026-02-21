@@ -35,6 +35,7 @@ const Header = () => {
       'catalogues': t.nav.catalogue,
       'movies': t.nav.movies,
       'tv series': t.nav.tvShows,
+      'anime': t.nav.anime,
     };
     return {
       ...link,
@@ -44,16 +45,7 @@ const Header = () => {
 
   useEffect(() => {
     const handleBackgroundChange = () => {
-      const body = document.body;
-      if (
-        window.scrollY > 0 ||
-        (body.classList.contains("no-scroll") &&
-          parseFloat(body.style.top) * -1 > 0)
-      ) {
-        setIsActive(true);
-      } else {
-        setIsActive(false);
-      }
+      setIsActive(window.scrollY > 8);
     };
 
     const throttledHandleBackgroundChange = throttle(

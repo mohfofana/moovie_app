@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Loader, Error, Section, PersonalSection } from "@/common";
-import { Hero, WeeklySpotlight } from "./components";
+import { Hero, WeeklySpotlight, TopTenWeekly } from "./components";
 import { Link } from "react-router-dom";
 
 import { titlesService } from "@/services/titlesService";
@@ -228,6 +228,8 @@ const Home = () => {
     <>
       <Hero movies={popularMovies} />
       <div className={cn(maxWidth, "lg:mt-12 md:mt-8 sm:mt-6 xs:mt-4 mt-2")}>
+        <TopTenWeekly />
+
         {/* Personal sections - only show if user is authenticated and has content */}
         {isAuthenticated && (
           <>

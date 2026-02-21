@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { GoSearch } from "react-icons/go";
 import { FiFilter } from "react-icons/fi";
 import { TbDeviceTv } from "react-icons/tb";
+import { useSearchParams } from "react-router-dom";
 
 import { MovieCard, SkelatonLoader } from "@/common";
 import { useLanguage } from "@/context/languageContext";
@@ -233,9 +234,17 @@ const CatalogShelf = ({
 
 const Catalogues = () => {
   const { locale } = useLanguage();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [searchInput, setSearchInput] = useState("");
   const [searchText, setSearchText] = useState("");
-  const [activeCategory, setActiveCategory] = useState<CategoryFilter>("all");
+  const [activeCategory, setActiveCategory] = useState<CategoryFilter>(() => {
+    const initialCategory = searchParams.get("category");
+    return initialCategory === "movie" ||
+      initialCategory === "tv" ||
+      initialCategory === "anime"
+      ? initialCategory
+      : "all";
+  });
   const [sortMode, setSortMode] = useState<SortMode>("all");
   const [latestOnly, setLatestOnly] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
@@ -370,9 +379,86 @@ const Catalogues = () => {
     sortMode,
   ]);
 
+  const animeMovieQuery = useGetShowsQuery(
+    {
+      category: "movie",
+      page: 1,
+      withGenres: 16,
+      sortBy:
+        sortMode === "rating"
+          ? "vote_average.desc"
+          : sortMode === "recent"
+            ? "primary_release_date.desc"
+            : "popularity.desc",
+    },
+    { skip: activeCategory !== "anime" || Boolean(selectedProviderId) || Boolean(searchText) }
+  );
+
+  const animeTvQuery = useGetShowsQuery(
+    {
+      category: "tv",
+      page: 1,
+      withGenres: 16,
+      sortBy:
+        sortMode === "rating"
+          ? "vote_average.desc"
+          : sortMode === "recent"
+            ? "first_air_date.desc"
+            : "popularity.desc",
+    },
+    { skip: activeCategory !== "anime" || Boolean(selectedProviderId) || Boolean(searchText) }
+  );
+
+  const animeAllResults = useMemo(() => {
+    if (activeCategory !== "anime" || selectedProviderId || searchText) {
+      return [];
+    }
+
+    const movies = ((animeMovieQuery.data?.results || []) as SearchMovie[]).map((item) => ({
+      ...item,
+      media_type: "movie" as const,
+    }));
+    const series = ((animeTvQuery.data?.results || []) as SearchMovie[]).map((item) => ({
+      ...item,
+      media_type: "tv" as const,
+    }));
+
+    return sortByMode([...movies, ...series], sortMode).slice(0, 30);
+  }, [
+    activeCategory,
+    animeMovieQuery.data,
+    animeTvQuery.data,
+    searchText,
+    selectedProviderId,
+    sortMode,
+  ]);
+
   const runSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setSearchText(searchInput.trim());
+  };
+
+  useEffect(() => {
+    const category = searchParams.get("category");
+    const nextCategory: CategoryFilter =
+      category === "movie" || category === "tv" || category === "anime"
+        ? category
+        : "all";
+
+    if (nextCategory !== activeCategory) {
+      setActiveCategory(nextCategory);
+    }
+  }, [activeCategory, searchParams]);
+
+  const updateCategory = (next: CategoryFilter) => {
+    setActiveCategory(next);
+    const nextParams = new URLSearchParams(searchParams);
+    if (next === "all") {
+      nextParams.delete("category");
+    } else {
+      nextParams.set("category", next);
+    }
+    setSearchParams(nextParams, { replace: true });
   };
 
   const isSearchActive = searchText.length > 0;
@@ -464,7 +550,7 @@ const Catalogues = () => {
                     ? "bg-white/12 text-white"
                     : "text-white/90 hover:text-white hover:bg-white/10"
                 )}
-                onClick={() => setActiveCategory("all")}
+                onClick={() => updateCategory("all")}
               >
                 {locale === "fr" ? "Accueil" : "Home"}
               </button>
@@ -476,7 +562,7 @@ const Catalogues = () => {
                     ? "bg-white/12 text-white font-semibold"
                     : "text-white/90 hover:text-white hover:bg-white/10"
                 )}
-                onClick={() => setActiveCategory("movie")}
+                onClick={() => updateCategory("movie")}
               >
                 {locale === "fr" ? "Tous les Films" : "All Movies"}
               </button>
@@ -488,7 +574,7 @@ const Catalogues = () => {
                     ? "bg-white/12 text-white font-semibold"
                     : "text-white/90 hover:text-white hover:bg-white/10"
                 )}
-                onClick={() => setActiveCategory("tv")}
+                onClick={() => updateCategory("tv")}
               >
                 {locale === "fr" ? "Toutes les Series" : "All Series"}
               </button>
@@ -500,7 +586,7 @@ const Catalogues = () => {
                     ? "bg-white/12 text-white font-semibold"
                     : "text-white/90 hover:text-white hover:bg-white/10"
                 )}
-                onClick={() => setActiveCategory("anime")}
+                onClick={() => updateCategory("anime")}
               >
                 {locale === "fr" ? "Tous les Animes" : "All Anime"}
               </button>
@@ -625,6 +711,27 @@ const Catalogues = () => {
               <div className="flex flex-wrap gap-x-4 gap-y-6">
                 {providerResults.map((movie) => (
                   <div key={`provider-${movie.media_type}-${movie.id}`} className="relative flex flex-col gap-2 w-[170px]">
+                    <MovieCard movie={movie} category={movie.media_type === "tv" ? "tv" : "movie"} />
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        ) : activeCategory === "anime" && !isSearchActive ? (
+          <section className="rounded-[22px] border border-white/10 bg-[linear-gradient(145deg,rgba(31,12,12,0.88),rgba(17,8,8,0.72))] p-5 sm:p-6 lg:p-8 shadow-[0_20px_46px_rgba(0,0,0,0.38)]">
+            <h3 className="text-[30px] sm:text-[40px] tracking-[-0.015em] leading-[1] font-roboto font-semibold text-white mb-6">
+              {locale === "fr" ? "Tous les Animes" : "All Anime"}
+            </h3>
+            {animeMovieQuery.isFetching || animeTvQuery.isFetching ? (
+              <SkelatonLoader isMoviesSliderLoader={false} />
+            ) : animeAllResults.length === 0 ? (
+              <p className="text-white/70 text-[16px]">
+                {locale === "fr" ? "Aucun anime trouve." : "No anime found."}
+              </p>
+            ) : (
+              <div className="flex flex-wrap gap-x-4 gap-y-6">
+                {animeAllResults.map((movie) => (
+                  <div key={`anime-all-${movie.media_type}-${movie.id}`} className="relative flex flex-col gap-2 w-[170px]">
                     <MovieCard movie={movie} category={movie.media_type === "tv" ? "tv" : "movie"} />
                   </div>
                 ))}

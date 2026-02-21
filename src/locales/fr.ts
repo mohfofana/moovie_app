@@ -5,6 +5,7 @@ export const fr = {
     catalogue: 'Catalogues',
     movies: 'Films',
     tvShows: 'Séries',
+    anime: 'Animes',
     myList: 'Ma Liste',
     favorites: 'Favoris',
     history: 'Historique',

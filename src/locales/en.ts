@@ -7,6 +7,7 @@ export const en: TranslationKeys = {
     catalogue: 'Catalogues',
     movies: 'Movies',
     tvShows: 'TV Shows',
+    anime: 'Anime',
     myList: 'My List',
     favorites: 'Favorites',
     history: 'History',

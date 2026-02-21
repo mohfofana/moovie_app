@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { cn } from "../../utils/helper";
 
 interface HeaderProps {
@@ -8,14 +8,35 @@ interface HeaderProps {
 }
 
 const HeaderNavItem = ({ link, showBg, isNotFoundPage }: HeaderProps) => {
+  const location = useLocation();
+
+  const isSameQueryCategory = () => {
+    if (!link.path.includes("?category=")) {
+      return false;
+    }
+
+    const [path, queryString] = link.path.split("?");
+    if (location.pathname !== path) {
+      return false;
+    }
+
+    const targetCategory = new URLSearchParams(queryString).get("category");
+    const currentCategory = new URLSearchParams(location.search).get("category");
+    return targetCategory === currentCategory;
+  };
+
   return (
     <li>
       <NavLink
         to={link.path}
         className={({ isActive }) => {
+          const computedActive = link.path.includes("?category=")
+            ? isSameQueryCategory()
+            : isActive;
+
           return cn(
             "nav-link",
-            isActive
+            computedActive
               ? "active text-white"
               : ` ${
                   isNotFoundPage || showBg
