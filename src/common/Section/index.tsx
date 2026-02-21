@@ -68,32 +68,30 @@ const Section: FC<SectionProps> = ({
 
   return (
     <section className={sectionStyle} ref={ref}>
-      <div className="rounded-[18px] border border-[rgba(255,255,255,0.08)] bg-[linear-gradient(135deg,rgba(40,14,14,0.55),rgba(19,8,8,0.4))] p-5 sm:p-6 mb-4">
-        <div className="flex flex-row justify-between items-center mb-6">
-          <div>
-            <span className="text-[#d95d5d] text-sm">Top contenu</span>
-            <h3 className="font-roboto sm:text-[38px] xs:text-[32px] text-[26px] tracking-tight text-gray-100 font-semibold">
-              {title}
-            </h3>
-          </div>
-          {!showSimilarShows && (
-            <Link to={`/${category}?type=${type}`} className={linkStyle}>
-              {t.common.seeAll}
-            </Link>
-          )}
+      <div className="flex flex-row justify-between items-center mb-6">
+        <div>
+          <span className="text-[#d95d5d] text-sm">Top contenu</span>
+          <h3 className="font-roboto sm:text-[38px] xs:text-[32px] text-[26px] tracking-tight text-gray-100 font-semibold">
+            {title}
+          </h3>
         </div>
-        <div className="sm:h-[312px] xs:h-[309px] h-[266px]">
-          {isLoading ? (
-            <SkelatonLoader />
-          ) : isError ? (
-            <Error error={String(errorMessage)} className="h-full text-[18px]" />
-          ) : (
-            <MoviesSlides
-              movies={data.results.slice(0, 10)}
-              category={category}
-            />
-          )}
-        </div>
+        {!showSimilarShows && (
+          <Link to={`/${category}?type=${type}`} className={linkStyle}>
+            {t.common.seeAll}
+          </Link>
+        )}
+      </div>
+      <div className="sm:h-[312px] xs:h-[309px] h-[266px]">
+        {isLoading ? (
+          <SkelatonLoader />
+        ) : isError ? (
+          <Error error={String(errorMessage)} className="h-full text-[18px]" />
+        ) : (
+          <MoviesSlides
+            movies={data.results.slice(0, 10)}
+            category={category}
+          />
+        )}
       </div>
     </section>
   );

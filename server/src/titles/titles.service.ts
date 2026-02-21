@@ -40,6 +40,14 @@ export class TitlesService {
     return details;
   }
 
+  async getTvSeasons(tmdbId: number, language?: string) {
+    return this.tmdb.getTvSeasons(tmdbId, language);
+  }
+
+  async getTvSeasonDetails(tmdbId: number, seasonNumber: number, language?: string) {
+    return this.tmdb.getTvSeasonDetails(tmdbId, seasonNumber, language);
+  }
+
   private async persistTitles(items: TmdbTitle[]) {
     if (!items.length) {
       return;

@@ -28,6 +28,37 @@ export interface TitleDetails {
       type: string;
     }>;
   };
+  seasons?: SeasonSummary[];
+  number_of_seasons?: number;
+}
+
+export interface SeasonSummary {
+  id: number;
+  season_number: number;
+  name: string;
+  overview?: string;
+  poster_path?: string;
+  episode_count?: number;
+  air_date?: string;
+}
+
+export interface EpisodeDetails {
+  id: number;
+  episode_number: number;
+  name: string;
+  overview?: string;
+  still_path?: string;
+  air_date?: string;
+  runtime?: number;
+}
+
+export interface SeasonDetails {
+  id: number;
+  name: string;
+  season_number: number;
+  overview?: string;
+  poster_path?: string;
+  episodes: EpisodeDetails[];
 }
 
 export interface TitleSearchResult {
@@ -78,6 +109,18 @@ export const titlesService = {
     const { data } = await apiClient.get<TitleDetails>(`/titles/${tmdbId}`, {
       params: { type },
     });
+    return data;
+  },
+
+  async getTvSeasons(tmdbId: number): Promise<SeasonSummary[]> {
+    const { data } = await apiClient.get<SeasonSummary[]>(`/titles/${tmdbId}/seasons`);
+    return data;
+  },
+
+  async getTvSeasonDetails(tmdbId: number, seasonNumber: number): Promise<SeasonDetails> {
+    const { data } = await apiClient.get<SeasonDetails>(
+      `/titles/${tmdbId}/seasons/${seasonNumber}`
+    );
     return data;
   },
 };

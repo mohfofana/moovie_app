@@ -23,21 +23,33 @@ export const tmdbApi = createApi({
         showSimilarShows?: boolean;
         id?: number;
       }) => {
+        const locale =
+          typeof window !== "undefined"
+            ? localStorage.getItem("locale") || "fr"
+            : "fr";
+        const language = locale === "en" ? "en-US" : "fr-FR";
+
         if (searchQuery) {
-          return `search/${category}?api_key=${API_KEY}&query=${searchQuery}&page=${page}`;
+          return `search/${category}?api_key=${API_KEY}&query=${searchQuery}&page=${page}&language=${language}`;
         }
 
         if (showSimilarShows) {
-          return `${category}/${id}/similar?api_key=${API_KEY}`;
+          return `${category}/${id}/similar?api_key=${API_KEY}&language=${language}`;
         }
 
-        return `${category}/${type}?api_key=${API_KEY}&page=${page}`;
+        return `${category}/${type}?api_key=${API_KEY}&page=${page}&language=${language}`;
       },
     }),
 
     getShow: builder.query({
-      query: ({ category, id }: { category: string; id: number }) =>
-        `${category}/${id}?append_to_response=videos,credits&api_key=${API_KEY}`,
+      query: ({ category, id }: { category: string; id: number }) => {
+        const locale =
+          typeof window !== "undefined"
+            ? localStorage.getItem("locale") || "fr"
+            : "fr";
+        const language = locale === "en" ? "en-US" : "fr-FR";
+        return `${category}/${id}?append_to_response=videos,credits&api_key=${API_KEY}&language=${language}`;
+      },
     }),
   }),
 });

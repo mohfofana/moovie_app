@@ -86,6 +86,19 @@ export class TmdbService {
     return this.fetchJson<any>(url);
   }
 
+  async getTvSeasons(tmdbId: number, language?: string) {
+    const lang = language || 'fr-FR';
+    const url = `${this.baseUrl}/tv/${tmdbId}?api_key=${this.apiKey}&language=${lang}`;
+    const data = await this.fetchJson<any>(url);
+    return data?.seasons || [];
+  }
+
+  async getTvSeasonDetails(tmdbId: number, seasonNumber: number, language?: string) {
+    const lang = language || 'fr-FR';
+    const url = `${this.baseUrl}/tv/${tmdbId}/season/${seasonNumber}?api_key=${this.apiKey}&language=${lang}`;
+    return this.fetchJson<any>(url);
+  }
+
   private async fetchJson<T>(url: string): Promise<T> {
     if (!this.apiKey) {
       throw new InternalServerErrorException('TMDB_API_KEY is missing');

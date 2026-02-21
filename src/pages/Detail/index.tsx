@@ -1,13 +1,20 @@
 import { useEffect, useMemo, useState } from 'react';
 import { m } from 'framer-motion';
 import { useParams } from 'react-router-dom';
-import { HiBookmark, HiHeart, HiOutlineDownload, HiOutlineEye } from 'react-icons/hi';
+import { HiBookmark, HiHeart, HiOutlineEye } from 'react-icons/hi';
 import { FaPlay } from 'react-icons/fa';
+import { FiChevronDown } from 'react-icons/fi';
 
 import { Poster, Loader, Error, Section, VideoBackground } from '@/common';
 import { Casts, Videos, Genre } from './components';
 
-import { titlesService, type TitleDetails } from '@/services/titlesService';
+import {
+  titlesService,
+  type EpisodeDetails,
+  type SeasonDetails,
+  type SeasonSummary,
+  type TitleDetails,
+} from '@/services/titlesService';
 import { watchlistService } from '@/services/watchlistService';
 import { useLanguage } from '@/context/languageContext';
 import { useMotion } from '@/hooks/useMotion';
@@ -16,21 +23,10 @@ import { cn } from '@/utils/helper';
 import { IMG_URL } from '@/utils/config';
 
 type ExtendedTitleDetails = TitleDetails & {
-  seasons?: Array<{
-    id: number;
-    name: string;
-    overview?: string;
-    episode_count?: number;
-    air_date?: string;
-    poster_path?: string;
-    still_path?: string;
-  }>;
   number_of_seasons?: number;
   runtime?: number;
   episode_run_time?: number[];
 };
-
-const tabs = ['Episodes', 'Videos & Bande Annonces', 'Contenu similaire', 'Casting & Production'];
 
 const Detail = () => {
   const { t } = useLanguage();
@@ -43,6 +39,11 @@ const Detail = () => {
   const [isInFavorites, setIsInFavorites] = useState(false);
   const [isAddingToWatchlist, setIsAddingToWatchlist] = useState(false);
   const [isAddingToFavorites, setIsAddingToFavorites] = useState(false);
+  const [seasons, setSeasons] = useState<SeasonSummary[]>([]);
+  const [selectedSeason, setSelectedSeason] = useState<number>(1);
+  const [seasonDetails, setSeasonDetails] = useState<SeasonDetails | null>(null);
+  const [isSeasonLoading, setIsSeasonLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>('');
   const { fadeDown, staggerContainer } = useMotion();
 
   useEffect(() => {
@@ -56,6 +57,16 @@ const Detail = () => {
         const type = category === 'movie' ? 'movie' : 'tv';
         const data = await titlesService.getDetails(Number(id), type);
         setMovie(data as ExtendedTitleDetails);
+
+        if (type === 'tv') {
+          const fetchedSeasons = await titlesService.getTvSeasons(Number(id));
+          const validSeasons = fetchedSeasons.filter((season) => season.season_number > 0);
+          setSeasons(validSeasons);
+          setSelectedSeason(validSeasons[0]?.season_number ?? 1);
+        } else {
+          setSeasons([]);
+          setSeasonDetails(null);
+        }
 
         const [inWatchlist, inFavorites] = await Promise.all([
           watchlistService.isInWatchlist(Number(id)),
@@ -72,6 +83,23 @@ const Detail = () => {
 
     fetchDetails();
   }, [id, category]);
+
+  useEffect(() => {
+    const fetchSeasonDetails = async () => {
+      if (!id || category !== 'tv' || !selectedSeason) return;
+      setIsSeasonLoading(true);
+      try {
+        const data = await titlesService.getTvSeasonDetails(Number(id), selectedSeason);
+        setSeasonDetails(data);
+      } catch {
+        setSeasonDetails(null);
+      } finally {
+        setIsSeasonLoading(false);
+      }
+    };
+
+    fetchSeasonDetails();
+  }, [id, category, selectedSeason]);
 
   useEffect(() => {
     document.title = movie && !isLoading ? movie.title || movie.name || 'Cinescope' : 'Cinescope';
@@ -119,6 +147,22 @@ const Detail = () => {
     const trailer = movie.videos.results.find((video: { type: string }) => video.type === 'Trailer');
     return trailer?.key || movie.videos.results[0]?.key || null;
   }, [movie]);
+
+  const tabs = useMemo(
+    () =>
+      category === 'tv'
+        ? ['Episodes', 'Videos & Bande Annonces', 'Contenu similaire', 'Casting & Production']
+        : ['Videos & Bande Annonces', 'Contenu similaire', 'Casting & Production'],
+    [category]
+  );
+
+  useEffect(() => {
+    if (!activeTab && tabs.length > 0) {
+      setActiveTab(tabs[0]);
+    } else if (activeTab && !tabs.includes(activeTab)) {
+      setActiveTab(tabs[0]);
+    }
+  }, [category, activeTab, tabs]);
 
   if (isLoading) return <Loader />;
   if (isError || !movie) return <Error error='Something went wrong!' />;
@@ -192,9 +236,6 @@ const Detail = () => {
                 <button className='px-5 py-3 rounded-2xl bg-white/10 border border-white/20 text-white inline-flex items-center gap-2 hover:bg-white/16'>
                   <HiOutlineEye /> 977
                 </button>
-                <button className='px-5 py-3 rounded-2xl bg-white/10 border border-white/20 text-white inline-flex items-center gap-2 hover:bg-white/16'>
-                  <HiOutlineDownload /> 19
-                </button>
               </m.div>
 
               <div className='mt-6'>
@@ -210,9 +251,10 @@ const Detail = () => {
           {tabs.map((tab, idx) => (
             <button
               key={tab}
+              onClick={() => setActiveTab(tab)}
               className={cn(
                 'px-5 py-3 rounded-2xl border text-sm sm:text-base font-semibold transition-all',
-                idx === 0
+                activeTab === tab
                   ? 'bg-white text-black border-white'
                   : 'bg-white/8 text-white border-white/15 hover:bg-white/14'
               )}
@@ -222,47 +264,66 @@ const Detail = () => {
           ))}
         </div>
 
-        <div className='mt-6 rounded-2xl bg-[rgba(80,25,25,0.32)] border border-[rgba(255,255,255,0.08)] p-4 text-[#f3dada] text-sm sm:text-base'>
-          Petite precision: Les informations de saisons et episodes proviennent de TMDB et peuvent differer selon certaines regions.
-        </div>
+        {activeTab === 'Episodes' && category === 'tv' && (
+          <div className='mt-6 rounded-2xl bg-[rgba(80,25,25,0.32)] border border-[rgba(255,255,255,0.08)] p-4 text-[#f3dada] text-sm sm:text-base'>
+            Petite precision: Les informations de saisons et episodes proviennent de TMDB et peuvent differer selon certaines regions.
+          </div>
+        )}
       </section>
 
-      {category === 'tv' && (movie.seasons?.length || 0) > 0 && (
+      {activeTab === 'Episodes' && category === 'tv' && seasons.length > 0 && (
         <section className={cn(maxWidth, 'pb-8')}>
           <div className='flex flex-wrap items-center justify-between gap-3 mb-5'>
-            <button className='px-5 py-3 rounded-2xl bg-white/12 border border-white/15 text-white font-semibold'>
-              Saison 1
-            </button>
-            <div className='flex gap-3'>
-              <button className='px-5 py-3 rounded-2xl bg-white/12 border border-white/15 text-white font-semibold'>
-                Afficher les telecharges uniquement
-              </button>
-              <button className='px-5 py-3 rounded-2xl bg-white/12 border border-white/15 text-white font-semibold'>
-                Activer anti-spoil
-              </button>
+            <div className='flex items-center gap-3'>
+              <label htmlFor='season-select' className='text-white/90 font-semibold'>
+                Saison
+              </label>
+              <div className='relative min-w-[220px]'>
+                <select
+                  id='season-select'
+                  value={selectedSeason}
+                  onChange={(e) => setSelectedSeason(Number(e.target.value))}
+                  className='appearance-none w-full px-4 pr-10 py-3 rounded-xl bg-[rgba(255,255,255,0.08)] border border-white/20 text-white font-semibold outline-none transition-all duration-200 hover:bg-[rgba(255,255,255,0.12)] focus:border-[#e24f4f] focus:ring-2 focus:ring-[#e24f4f]/30'
+                >
+                  {seasons.map((season) => (
+                    <option key={season.id} value={season.season_number} className='bg-[#1a0d0d] text-white'>
+                      Saison {season.season_number}
+                    </option>
+                  ))}
+                </select>
+                <span className='pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-white/75'>
+                  <FiChevronDown />
+                </span>
+              </div>
             </div>
           </div>
 
           <div className='grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-5'>
-            {movie.seasons?.slice(0, 8).map((season, idx) => {
-              const imagePath = season.poster_path || backdropPath;
+            {isSeasonLoading && (
+              <div className='col-span-full text-white/80'>Chargement des episodes...</div>
+            )}
+            {!isSeasonLoading &&
+              (seasonDetails?.episodes || []).map((episode: EpisodeDetails) => {
+                const imagePath = episode.still_path || backdropPath;
+                const runtime = episode.runtime ? `${episode.runtime} min` : '';
               return (
-                <article key={season.id} className='rounded-2xl overflow-hidden border border-white/10 bg-[rgba(17,7,7,0.72)]'>
+                <article key={episode.id} className='rounded-2xl overflow-hidden border border-white/10 bg-[rgba(17,7,7,0.72)]'>
                   <div className='relative h-[180px]'>
                     <img
                       src={`${IMG_URL}/original/${imagePath}`}
-                      alt={season.name}
+                      alt={episode.name}
                       className='w-full h-full object-cover'
                     />
-                    <div className='absolute top-3 right-3 bg-white text-black rounded-xl p-2'>
-                      <HiOutlineDownload size={18} />
-                    </div>
                   </div>
                   <div className='p-4'>
-                    <p className='text-[#d6c8c8] text-sm'>Saison {idx + 1} - {season.episode_count || 0} episodes</p>
-                    <h3 className='text-white text-[32px] leading-tight mt-1 font-semibold'>{season.name}</h3>
+                    <p className='text-[#d6c8c8] text-sm'>
+                      Episode {episode.episode_number}
+                      {runtime ? ` - ${runtime}` : ''}
+                      {episode.air_date ? ` - ${episode.air_date}` : ''}
+                    </p>
+                    <h3 className='text-white text-[32px] leading-tight mt-1 font-semibold'>{episode.name}</h3>
                     <p className='text-[#e3d3d3] text-sm mt-2 line-clamp-4'>
-                      {season.overview || 'Description indisponible pour cette saison.'}
+                      {episode.overview || 'Description indisponible pour cet episode.'}
                     </p>
                   </div>
                 </article>
@@ -272,15 +333,26 @@ const Detail = () => {
         </section>
       )}
 
-      <Videos videos={videos} />
+      {activeTab === 'Videos & Bande Annonces' && <Videos videos={videos} />}
 
-      <Section
-        title={`Similar ${category === 'movie' ? 'movies' : 'series'}`}
-        category={String(category)}
-        className={`${maxWidth}`}
-        id={Number(id)}
-        showSimilarShows
-      />
+      {activeTab === 'Contenu similaire' && (
+        <Section
+          title={`Similar ${category === 'movie' ? 'movies' : 'series'}`}
+          category={String(category)}
+          className={`${maxWidth}`}
+          id={Number(id)}
+          showSimilarShows
+        />
+      )}
+
+      {activeTab === 'Casting & Production' && (
+        <section className={cn(maxWidth, 'pb-10')}>
+          <h3 className='font-roboto text-white text-[30px] sm:text-[36px] mb-6'>Casting & Production</h3>
+          <div className='rounded-2xl border border-white/10 bg-[rgba(21,10,10,0.65)] p-6'>
+            <Casts casts={casts} />
+          </div>
+        </section>
+      )}
     </>
   );
 };
