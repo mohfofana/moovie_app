@@ -2,9 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 import { GoSearch } from "react-icons/go";
 import { FiFilter } from "react-icons/fi";
 import { TbDeviceTv } from "react-icons/tb";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
+import { Swiper, SwiperSlide } from "swiper/react";
 
 import { MovieCard, SkelatonLoader } from "@/common";
+import Image from "@/common/Image";
 import { useLanguage } from "@/context/languageContext";
 import { useGetShowsQuery } from "@/services/TMDB";
 import { maxWidth } from "@/styles";
@@ -31,6 +33,7 @@ type SearchMovie = IMovie & {
   first_air_date?: string;
   genre_ids?: number[];
   original_language?: string;
+  popularity?: number;
 };
 
 type ProviderOption = {
@@ -114,6 +117,79 @@ const isAnimeTitle = (movie: SearchMovie) => {
   const isAnimationGenre = movie.genre_ids?.includes(16);
   const isJapanese = movie.original_language === "ja";
   return Boolean(isAnimationGenre || isJapanese);
+};
+
+const CategoryRanking = ({
+  title,
+  items,
+  loading,
+}: {
+  title: string;
+  items: SearchMovie[];
+  loading: boolean;
+}) => {
+  if (loading) {
+    return (
+      <section className="rounded-[24px] border border-white/10 bg-[linear-gradient(145deg,rgba(31,12,12,0.88),rgba(17,8,8,0.72))] p-6 sm:p-8 lg:p-10 shadow-[0_20px_46px_rgba(0,0,0,0.38)]">
+        <SkelatonLoader />
+      </section>
+    );
+  }
+
+  if (!items.length) {
+    return null;
+  }
+
+  return (
+    <section className="rounded-[24px] border border-white/10 bg-[linear-gradient(145deg,rgba(31,12,12,0.88),rgba(17,8,8,0.72))] p-6 sm:p-8 lg:p-10 shadow-[0_20px_46px_rgba(0,0,0,0.38)]">
+      <h3 className="font-roboto sm:text-[30px] text-[24px] tracking-tight text-white font-semibold mb-5">
+        {title}
+      </h3>
+      <Swiper slidesPerView="auto" spaceBetween={24} className="!overflow-visible">
+        {items.map((item, index) => {
+          const titleLabel = item.original_title || item.name;
+          const mediaType = item.media_type === "tv" ? "tv" : "movie";
+          const num = index + 1;
+          const isDouble = num === 10;
+
+          return (
+            <SwiperSlide key={`rank-${mediaType}-${item.id}`} style={{ width: isDouble ? "318px" : "292px" }}>
+              <Link to={`/${mediaType}/${item.id}`} className="relative flex items-end group select-none h-[320px]">
+                <span
+                  className="font-roboto font-black italic leading-[0.8] select-none pointer-events-none absolute bottom-0 left-0 z-0"
+                  style={{
+                    fontSize: isDouble ? "220px" : "250px",
+                    left: isDouble ? "-26px" : "-20px",
+                    color: "transparent",
+                    WebkitTextStroke: "3px rgba(255,255,255,0.22)",
+                    paintOrder: "stroke fill",
+                  }}
+                >
+                  {num}
+                </span>
+
+                <div
+                  className="relative z-10 transition-all duration-300 ease-out group-hover:scale-105 group-hover:-translate-y-1"
+                  style={{ marginLeft: isDouble ? "108px" : "90px" }}
+                >
+                  <div className="w-[190px] h-[280px] rounded-[14px] overflow-hidden shadow-[0_6px_24px_rgba(0,0,0,0.55)] group-hover:shadow-[0_12px_36px_rgba(0,0,0,0.75)]">
+                    <Image
+                      height={280}
+                      width={190}
+                      src={`https://image.tmdb.org/t/p/w342/${item.poster_path}`}
+                      alt={titleLabel}
+                      className="w-full h-full object-cover"
+                      effect="zoomIn"
+                    />
+                  </div>
+                </div>
+              </Link>
+            </SwiperSlide>
+          );
+        })}
+      </Swiper>
+    </section>
+  );
 };
 
 const CatalogShelf = ({
@@ -492,6 +568,87 @@ const Catalogues = () => {
     return sortByMode(scoped, sortMode).slice(0, 24);
   }, [activeCategory, isSearchActive, movieSearch.data, tvSearch.data, sortMode]);
 
+  const movieRankingQuery = useGetShowsQuery(
+    { category: "movie", page: 1, sortBy: "vote_count.desc" },
+    { skip: activeCategory !== "movie" || isSearchActive || Boolean(selectedProviderId) }
+  );
+
+  const tvRankingQuery = useGetShowsQuery(
+    { category: "tv", page: 1, sortBy: "vote_count.desc" },
+    { skip: activeCategory !== "tv" || isSearchActive || Boolean(selectedProviderId) }
+  );
+
+  const animeMovieRankingQuery = useGetShowsQuery(
+    { category: "movie", page: 1, withGenres: 16, sortBy: "vote_count.desc" },
+    { skip: activeCategory !== "anime" || isSearchActive || Boolean(selectedProviderId) }
+  );
+
+  const animeTvRankingQuery = useGetShowsQuery(
+    { category: "tv", page: 1, withGenres: 16, sortBy: "vote_count.desc" },
+    { skip: activeCategory !== "anime" || isSearchActive || Boolean(selectedProviderId) }
+  );
+
+  const categoryRankingItems = useMemo(() => {
+    if (activeCategory === "movie") {
+      return ((movieRankingQuery.data?.results || []) as SearchMovie[])
+        .filter((item) => !!item.poster_path)
+        .slice(0, 10);
+    }
+
+    if (activeCategory === "tv") {
+      return ((tvRankingQuery.data?.results || []) as SearchMovie[])
+        .filter((item) => !!item.poster_path)
+        .slice(0, 10);
+    }
+
+    if (activeCategory === "anime") {
+      const animeMovies = ((animeMovieRankingQuery.data?.results || []) as SearchMovie[]).map((item) => ({
+        ...item,
+        media_type: "movie" as const,
+      }));
+      const animeSeries = ((animeTvRankingQuery.data?.results || []) as SearchMovie[]).map((item) => ({
+        ...item,
+        media_type: "tv" as const,
+      }));
+
+      return [...animeMovies, ...animeSeries]
+        .filter((item) => !!item.poster_path)
+        .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
+        .slice(0, 10);
+    }
+
+    return [];
+  }, [
+    activeCategory,
+    animeMovieRankingQuery.data,
+    animeTvRankingQuery.data,
+    movieRankingQuery.data,
+    tvRankingQuery.data,
+  ]);
+
+  const showCategoryRanking = activeCategory !== "all" && !isSearchActive && !selectedProviderId;
+  const categoryRankingLoading =
+    (activeCategory === "movie" && (movieRankingQuery.isLoading || movieRankingQuery.isFetching)) ||
+    (activeCategory === "tv" && (tvRankingQuery.isLoading || tvRankingQuery.isFetching)) ||
+    (activeCategory === "anime" &&
+      (animeMovieRankingQuery.isLoading ||
+        animeMovieRankingQuery.isFetching ||
+        animeTvRankingQuery.isLoading ||
+        animeTvRankingQuery.isFetching));
+
+  const categoryRankingTitle =
+    locale === "fr"
+      ? activeCategory === "movie"
+        ? "Classement Films - Les plus vus (global)"
+        : activeCategory === "tv"
+          ? "Classement Series - Les plus vues (global)"
+          : "Classement Animes - Les plus vus (global)"
+      : activeCategory === "movie"
+        ? "Movie ranking - Most viewed (global)"
+        : activeCategory === "tv"
+          ? "Series ranking - Most viewed (global)"
+          : "Anime ranking - Most viewed (global)";
+
   return (
     <div className="pt-[86px] pb-14">
       <section className="relative overflow-hidden border-b border-white/10">
@@ -673,6 +830,14 @@ const Catalogues = () => {
       </section>
 
       <section className={cn(maxWidth, "mt-8 flex flex-col gap-8")}>
+        {showCategoryRanking ? (
+          <CategoryRanking
+            title={categoryRankingTitle}
+            items={categoryRankingItems}
+            loading={categoryRankingLoading}
+          />
+        ) : null}
+
         <div className="rounded-[18px] border border-red-300/20 bg-[linear-gradient(90deg,rgba(67,17,17,0.75),rgba(108,15,15,0.68))] p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <p className="text-[#f6dede] text-[30px] leading-[1] font-roboto font-semibold">

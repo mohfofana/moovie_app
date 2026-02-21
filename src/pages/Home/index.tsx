@@ -228,7 +228,7 @@ const Home = () => {
     <>
       <Hero movies={popularMovies} />
       <div className={cn(maxWidth, "lg:mt-12 md:mt-8 sm:mt-6 xs:mt-4 mt-2")}>
-        <TopTenWeekly />
+        <TopTenWeekly mediaType="movie" />
 
         {/* Personal sections - only show if user is authenticated and has content */}
         {isAuthenticated && (
@@ -253,6 +253,7 @@ const Home = () => {
         {/* Default sections */}
         {sections.map(({ category, type }, index) => (
           <div key={`${category}_${type}`}>
+            {index === 2 ? <TopTenWeekly mediaType="tv" /> : null}
             {weeklySpotlight && index === 3 ? (
               <WeeklySpotlight item={weeklySpotlight} weekNumber={spotlightWeek} />
             ) : null}
