@@ -27,11 +27,11 @@ export class TitlesService {
     await this.persistTitles([
       {
         id: details.id,
-        title: details.title,
+        title: details.title || details.name,
         overview: details.overview,
         poster_path: details.poster_path,
         backdrop_path: details.backdrop_path,
-        release_date: details.release_date,
+        release_date: details.release_date || details.first_air_date,
         popularity: details.popularity,
         media_type: type,
       },
