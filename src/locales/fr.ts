@@ -2,6 +2,7 @@ export const fr = {
   // Navigation
   nav: {
     home: 'Accueil',
+    catalogue: 'Catalogues',
     movies: 'Films',
     tvShows: 'Séries',
     myList: 'Ma Liste',

@@ -54,10 +54,10 @@ const HeroSlide = ({ movie }: { movie: MovieWithVideos }) => {
 
   return (
     <div className="h-full w-full relative overflow-hidden">
-      <VideoBackground videoKey={videoKey || undefined} backdropPath={backdropPath} />
+      <VideoBackground videoKey={videoKey || undefined} backdropPath={backdropPath} overlayTone="light" />
 
-      <div className="absolute inset-0 bg-gradient-to-r from-[rgba(8,4,4,0.62)] via-[rgba(8,4,4,0.3)] to-[rgba(8,4,4,0.66)] z-20" />
-      <div className="absolute inset-0 bg-gradient-to-b from-[rgba(0,0,0,0.12)] to-[rgba(9,4,4,0.92)] z-20" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[rgba(8,4,4,0.42)] via-[rgba(8,4,4,0.14)] to-[rgba(8,4,4,0.46)] z-20" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[rgba(0,0,0,0.04)] to-[rgba(9,4,4,0.68)] z-20" />
 
       <div className={cn(maxWidth, 'relative z-30 h-full flex items-center lg:gap-16 gap-8 pt-20')}>
         <m.div

@@ -5,11 +5,27 @@ interface VideoBackgroundProps {
   videoKey?: string;
   backdropPath?: string;
   className?: string;
+  overlayTone?: 'default' | 'light';
 }
 
-const VideoBackground = ({ videoKey, backdropPath, className }: VideoBackgroundProps) => {
+const VideoBackground = ({
+  videoKey,
+  backdropPath,
+  className,
+  overlayTone = 'default',
+}: VideoBackgroundProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
+
+  const overlayRightClass =
+    overlayTone === 'light'
+      ? 'absolute inset-0 bg-gradient-to-r from-black/58 via-black/18 to-black/52 z-10'
+      : 'absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-black/80 z-10';
+
+  const overlayBottomClass =
+    overlayTone === 'light'
+      ? 'absolute inset-0 bg-gradient-to-t from-black/74 via-black/24 to-transparent z-10'
+      : 'absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent z-10';
 
   useEffect(() => {
     // Show video after a short delay to ensure smooth loading
@@ -30,9 +46,8 @@ const VideoBackground = ({ videoKey, backdropPath, className }: VideoBackgroundP
             backgroundImage: `url('https://image.tmdb.org/t/p/original/${backdropPath}')`,
           }}
         />
-        {/* Dark gradient overlays */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-black/80 z-10" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent z-10" />
+        <div className={overlayRightClass} />
+        <div className={overlayBottomClass} />
       </div>
     );
   }
@@ -77,9 +92,8 @@ const VideoBackground = ({ videoKey, backdropPath, className }: VideoBackgroundP
         />
       )}
 
-      {/* Dark gradient overlays */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-black/80 z-10" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent z-10" />
+      <div className={overlayRightClass} />
+      <div className={overlayBottomClass} />
     </div>
   );
 };

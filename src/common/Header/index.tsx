@@ -32,6 +32,7 @@ const Header = () => {
   const translatedNavLinks = navLinks.map(link => {
     const titleMap: Record<string, string> = {
       'home': t.nav.home,
+      'catalogues': t.nav.catalogue,
       'movies': t.nav.movies,
       'tv series': t.nav.tvShows,
     };

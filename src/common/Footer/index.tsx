@@ -1,65 +1,86 @@
 import { Link } from "react-router-dom";
 
 import Logo from "../Logo";
-import FooterImg from "@/assets/images/footer-bg.webp";
 import { footerLinks } from "@/constants";
 import { maxWidth } from "@/styles";
 import { cn } from "@/utils/helper";
+
+const footerLabelFr: Record<string, string> = {
+  home: "accueil",
+  live: "direct",
+  "you must watch": "a voir absolument",
+  "contact us": "contact",
+  FAQ: "faq",
+  "Recent release": "sorties recentes",
+  "term of services": "conditions d utilisation",
+  premium: "premium",
+  "Top IMDB": "top imdb",
+  "About us": "a propos",
+  "Privacy policy": "politique de confidentialite",
+};
 
 const Footer: React.FC = () => {
   return (
     <footer
       style={{
-        backgroundImage: `
-          radial-gradient(circle at 50% 0%, rgba(0, 217, 255, 0.05), transparent 40%),
-          linear-gradient(to bottom, rgba(10,10,10,0.85), rgba(10,10,10,0.95)),
-          url(${FooterImg})`,
-        backgroundPosition: "center",
-        backgroundSize: "cover",
+        background:
+          "radial-gradient(1100px 420px at 82% -6%, rgba(186, 40, 40, 0.24), transparent 62%), radial-gradient(850px 340px at 0% 100%, rgba(120, 16, 16, 0.22), transparent 58%), linear-gradient(180deg, #120707 0%, #070303 100%)",
       }}
-      className="dark:bg-bg-primary bg-gray-900 lg:py-20 sm:py-14 xs:py-10 py-8 w-full border-t border-accent-cyan/20 backdrop-blur-sm relative overflow-hidden"
+      className="w-full lg:pt-20 lg:pb-10 sm:pt-16 sm:pb-9 xs:pt-12 xs:pb-8 pt-10 pb-7 border-t border-white/10 relative overflow-hidden"
     >
-      {/* Decorative gradient */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-neon opacity-50" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_40%,rgba(255,255,255,0.04),transparent_36%)] pointer-events-none" />
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-red-400/45 to-transparent" />
 
-      <div
-        className={cn(
-          maxWidth,
-          `flex flex-col items-center lg:gap-16 md:gap-14 sm:gap-10 xs:gap-8 gap-6 relative z-10`
-        )}
-      >
-        <Logo logoColor="text-white" />
+      <div className={cn(maxWidth, "relative z-10")}>
+        <div className="grid lg:grid-cols-[minmax(0,1fr)_auto] gap-10 items-start">
+          <div className="space-y-5 max-w-[540px]">
+            <Logo logoColor="text-white" />
+            <p className="text-[15px] leading-relaxed text-white/70">
+              Plateforme cinema inspiree des codes streaming premium:
+              decouverte, watchlist et navigation fluide dans un univers sombre
+              et immersif.
+            </p>
+            <div className="inline-flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.04] px-3 py-3 shadow-[0_12px_28px_rgba(0,0,0,0.35)]">
+              <span className="text-[13px] text-white/75">
+                Lance une nouvelle session de visionnage
+              </span>
+              <Link
+                to="/movie"
+                className="rounded-xl bg-red-500/90 hover:bg-red-500 text-white font-semibold text-[13px] px-4 py-2 transition-colors duration-200"
+              >
+                Explorer
+              </Link>
+            </div>
+            <div className="rounded-2xl border border-red-300/20 bg-red-950/30 px-4 py-3 text-[12px] leading-relaxed text-white/70">
+              <span className="font-semibold text-white/85">Disclaimer:</span>{" "}
+              Ce site n heberge aucun contenu video. Les donnees, images et
+              metadonnees proviennent de fournisseurs tiers, notamment TMDB.
+            </div>
+          </div>
 
-        <ul className="grid grid-cols-3 items-center justify-center font-medium text-gray-400 capitalize md:gap-x-20 md:gap-y-5 sm:gap-x-12 sm:gap-y-4 xs:gap-x-8 xs:gap-y-3 gap-x-6 gap-y-2">
-          {footerLinks.map((title, index) => {
-            return (
-              <li key={index} className="text-center">
+          <ul className="grid sm:grid-cols-3 grid-cols-2 sm:gap-x-10 gap-x-6 gap-y-3 pt-1">
+            {footerLinks.map((title, index) => (
+              <li key={index}>
                 <Link
                   to="/"
-                  className="hover:text-accent-cyan transition-all duration-300 md:text-[13px] sm:text-[12.5px] xs:text-[12px] text-[11px] tracking-[0.1em] uppercase font-bold font-mono group"
+                  className="text-white/60 hover:text-white text-[12px] tracking-[0.12em] uppercase font-semibold transition-colors duration-200"
                 >
-                  <span className="relative">
-                    {title}
-                    <span className="absolute bottom-0 left-0 w-0 h-px bg-accent-cyan group-hover:w-full transition-all duration-300" />
-                  </span>
+                  {footerLabelFr[title] ?? title}
                 </Link>
               </li>
-            );
-          })}
-        </ul>
+            ))}
+          </ul>
+        </div>
 
-        {/* Divider */}
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+        <div className="w-full h-px bg-gradient-to-r from-transparent via-white/12 to-transparent mt-10 mb-4" />
 
-        {/* Copyright */}
-        <p className="text-gray-500 text-xs font-mono tracking-wider">
-          © 2026 Cinescope. Powered by{" "}
-          <span className="font-semibold">TMDB</span>
-        </p>
+        <div className="flex sm:flex-row flex-col sm:items-center sm:justify-between gap-3 text-[12px] text-white/45 tracking-[0.08em] uppercase">
+          <p>&copy; 2026 Cinescope. Tous droits reserves.</p>
+          <p className="text-[15px] tracking-[0.03em] normal-case text-white/75">
+            De babi a Rennes avec <span className="text-red-500">&hearts;</span>
+          </p>
+        </div>
       </div>
-
-      {/* Background glow effect */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-accent-cyan/5 rounded-full blur-[100px] pointer-events-none" />
     </footer>
   );
 };

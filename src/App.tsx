@@ -16,6 +16,7 @@ import "react-loading-skeleton/dist/skeleton.css";
 import "swiper/css";
 
 const Catalog = lazy(() => import("./pages/Catalog"));
+const Catalogues = lazy(() => import("./pages/Catalogues"));
 const Home = lazy(() => import("./pages/Home"));
 const Detail = lazy(() => import("./pages/Detail"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -38,6 +39,7 @@ const App = () => {
           <Suspense fallback={<Loader />}>
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/catalogues" element={<Catalogues />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />

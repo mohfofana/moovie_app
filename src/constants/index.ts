@@ -1,9 +1,8 @@
-import { FiSun } from "react-icons/fi";
 import { BsMoonStarsFill } from "react-icons/bs";
-import { GoDeviceDesktop } from "react-icons/go";
 import { AiOutlineHome } from "react-icons/ai";
 import { TbMovie } from "react-icons/tb";
 import { MdOutlineLiveTv } from "react-icons/md";
+import { BiCollection } from "react-icons/bi";
 
 import { ITheme, INavLink } from "../types";
 
@@ -12,6 +11,11 @@ export const navLinks: INavLink[] = [
     title: "home",
     path: "/",
     icon: AiOutlineHome,
+  },
+  {
+    title: "catalogues",
+    path: "/catalogues",
+    icon: BiCollection,
   },
   {
     title: "movies",
@@ -29,14 +33,6 @@ export const themeOptions: ITheme[] = [
   {
     title: "Dark",
     icon: BsMoonStarsFill,
-  },
-  {
-    title: "Light",
-    icon: FiSun,
-  },
-  {
-    title: "System",
-    icon: GoDeviceDesktop,
   },
 ];
 

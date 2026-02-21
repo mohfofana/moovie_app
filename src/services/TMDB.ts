@@ -13,6 +13,9 @@ export const tmdbApi = createApi({
         type,
         searchQuery,
         page,
+        watchProviderId,
+        watchRegion,
+        sortBy,
         showSimilarShows,
         id,
       }: {
@@ -20,6 +23,9 @@ export const tmdbApi = createApi({
         type?: string;
         page?: number;
         searchQuery?: string;
+        watchProviderId?: number;
+        watchRegion?: string;
+        sortBy?: string;
         showSimilarShows?: boolean;
         id?: number;
       }) => {
@@ -35,6 +41,12 @@ export const tmdbApi = createApi({
 
         if (showSimilarShows) {
           return `${category}/${id}/similar?api_key=${API_KEY}&language=${language}`;
+        }
+
+        if (watchProviderId) {
+          const region = watchRegion || (locale === "en" ? "US" : "FR");
+          const sort = sortBy || "popularity.desc";
+          return `discover/${category}?api_key=${API_KEY}&page=${page}&language=${language}&watch_region=${region}&with_watch_providers=${watchProviderId}&sort_by=${sort}`;
         }
 
         return `${category}/${type}?api_key=${API_KEY}&page=${page}&language=${language}`;

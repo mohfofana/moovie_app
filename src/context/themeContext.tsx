@@ -20,20 +20,14 @@ const initialTheme = getTheme();
 
 const ThemeProvider = ({ children }: Props) => {
   const [showThemeOptions, setShowThemeOptions] = useState<boolean>(false);
-  const [theme, setTheme] = useState<string>(initialTheme);
+  const [theme, setTheme] = useState<string>(initialTheme === "Dark" ? "Dark" : "Dark");
 
   const checkSystemTheme = () => {
-    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      setTheme("Dark");
-    } else {
-      setTheme("Light");
-    }
+    setTheme("Dark");
   };
 
   const checkTheme = useCallback(() => {
-    if (initialTheme) return;
     setTheme("Dark");
-    // checkSystemTheme();
   }, []);
 
   useEffect(() => {
@@ -41,13 +35,11 @@ const ThemeProvider = ({ children }: Props) => {
   }, [checkTheme]);
 
   useEffect(() => {
-    if (theme === "Dark") {
-      document.documentElement.classList.add("dark");
-      saveTheme("Dark");
-    } else if (theme === "Light") {
-      document.documentElement.classList.remove("dark");
-      saveTheme("Light");
-    }
+    const root = document.documentElement;
+    root.classList.add("dark");
+    root.classList.remove("light");
+    root.style.colorScheme = "dark";
+    saveTheme("Dark");
   }, [theme]);
 
   const openMenu = () => {

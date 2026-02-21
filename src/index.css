@@ -25,6 +25,10 @@
   --glass-border: rgba(255, 255, 255, 0.09);
   --cinema-bg: #0a0505;
   --cinema-surface: rgba(28, 13, 13, 0.85);
+  --app-bg:
+    radial-gradient(circle at 80% 0%, rgba(115, 22, 22, 0.35), transparent 38%),
+    radial-gradient(circle at 12% 100%, rgba(93, 14, 14, 0.28), transparent 40%),
+    linear-gradient(180deg, #130707 0%, #080505 100%);
 }
 
 html,
@@ -40,15 +44,24 @@ body {
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
   overflow-y: scroll;
-  background:
-    radial-gradient(circle at 80% 0%, rgba(115, 22, 22, 0.35), transparent 38%),
-    radial-gradient(circle at 12% 100%, rgba(93, 14, 14, 0.28), transparent 40%),
-    linear-gradient(180deg, #130707 0%, #080505 100%);
+  background: var(--app-bg);
   color: var(--text-primary);
 }
 
 .dark body {
-  background:
+  --bg-primary: #080505;
+  --bg-secondary: #120707;
+  --bg-elevated: #1b0c0d;
+  --accent-red: #dd3e3e;
+  --accent-red-soft: rgba(221, 62, 62, 0.18);
+  --text-primary: #f5f2f1;
+  --text-secondary: #b9acaa;
+  --text-tertiary: #857775;
+  --glass-bg: rgba(36, 24, 24, 0.78);
+  --glass-border: rgba(255, 255, 255, 0.09);
+  --cinema-bg: #0a0505;
+  --cinema-surface: rgba(28, 13, 13, 0.85);
+  --app-bg:
     radial-gradient(circle at 80% 0%, rgba(115, 22, 22, 0.35), transparent 38%),
     radial-gradient(circle at 12% 100%, rgba(93, 14, 14, 0.28), transparent 40%),
     linear-gradient(180deg, #130707 0%, #080505 100%);
@@ -137,11 +150,11 @@ body::before {
 }
 
 .light-glass {
-  background: var(--cinema-surface);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 10px 24px rgba(45, 20, 20, 0.12);
   backdrop-filter: blur(28px);
   -webkit-backdrop-filter: blur(28px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(88, 41, 41, 0.12);
 }
 
 .dark-glass {

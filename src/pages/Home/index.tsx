@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Loader, Error, Section, PersonalSection } from "@/common";
-import { Hero } from "./components";
+import { Hero, WeeklySpotlight } from "./components";
 import { Link } from "react-router-dom";
 
 import { titlesService } from "@/services/titlesService";
@@ -33,10 +33,27 @@ interface MovieWithVideos {
   };
 }
 
+const getIsoWeekNumber = (date: Date) => {
+  const target = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = target.getUTCDay() || 7;
+  target.setUTCDate(target.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(target.getUTCFullYear(), 0, 1));
+  return Math.ceil((((target.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+};
+
 const Home = () => {
   const { t } = useLanguage();
   const { isAuthenticated } = useAuth();
   const [popularMovies, setPopularMovies] = useState<MovieWithVideos[]>([]);
+  const [weeklySpotlight, setWeeklySpotlight] = useState<(MovieWithVideos & {
+    mediaType: "movie" | "tv";
+    release_date?: string;
+    first_air_date?: string;
+    genres?: Array<{ id: number; name: string }>;
+    runtime?: number;
+    episode_run_time?: number[];
+  }) | null>(null);
+  const [spotlightWeek, setSpotlightWeek] = useState<number>(getIsoWeekNumber(new Date()));
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
 
@@ -104,6 +121,40 @@ const Home = () => {
     };
 
     fetchPopularMoviesWithVideos();
+  }, []);
+
+  useEffect(() => {
+    const fetchWeeklySpotlight = async () => {
+      try {
+        const week = getIsoWeekNumber(new Date());
+        setSpotlightWeek(week);
+
+        const mediaType: "movie" | "tv" = week % 2 === 0 ? "movie" : "tv";
+        const trending = await titlesService.getTrending(mediaType);
+        const candidates = trending.results.filter((item) => !!item.backdrop_path);
+        const pickPool = candidates.length > 0 ? candidates : trending.results;
+
+        if (!pickPool.length) {
+          return;
+        }
+
+        const pick = pickPool[week % pickPool.length];
+        const details = await titlesService.getDetails(pick.id, mediaType);
+
+        setWeeklySpotlight({
+          ...pick,
+          ...details,
+          id: String(pick.id),
+          name: details.name || details.title || pick.name || pick.title || "",
+          original_title: details.title || details.name || pick.title || "",
+          mediaType,
+        });
+      } catch (err) {
+        console.error("Failed to fetch weekly spotlight:", err);
+      }
+    };
+
+    fetchWeeklySpotlight();
   }, []);
 
   // Fetch personal sections if user is authenticated
@@ -198,14 +249,22 @@ const Home = () => {
         )}
 
         {/* Default sections */}
-        {sections.map(({ category, type }) => (
-          <Section
-            title={getSectionTitle(category, type)}
-            category={category}
-            type={type}
-            key={`${category}_${type}`}
-          />
+        {sections.map(({ category, type }, index) => (
+          <div key={`${category}_${type}`}>
+            {weeklySpotlight && index === 3 ? (
+              <WeeklySpotlight item={weeklySpotlight} weekNumber={spotlightWeek} />
+            ) : null}
+            <Section
+              title={getSectionTitle(category, type)}
+              category={category}
+              type={type}
+            />
+          </div>
         ))}
+
+        {weeklySpotlight && sections.length < 4 ? (
+          <WeeklySpotlight item={weeklySpotlight} weekNumber={spotlightWeek} />
+        ) : null}
 
         <div className="mt-4 mb-10 rounded-[18px] border border-[rgba(255,255,255,0.1)] bg-[linear-gradient(120deg,rgba(145,35,35,0.48),rgba(64,16,16,0.62))] p-6 sm:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="max-w-[760px]">

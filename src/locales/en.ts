@@ -4,6 +4,7 @@ export const en: TranslationKeys = {
   // Navigation
   nav: {
     home: 'Home',
+    catalogue: 'Catalogues',
     movies: 'Movies',
     tvShows: 'TV Shows',
     myList: 'My List',
