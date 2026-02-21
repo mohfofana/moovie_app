@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query, Headers } from '@nestjs/common';
 
 import { SearchTitlesDto } from './dto/search-titles.dto';
 import { TrendingTitlesDto } from './dto/trending-titles.dto';
@@ -9,17 +9,27 @@ export class TitlesController {
   constructor(private readonly titlesService: TitlesService) {}
 
   @Get('trending')
-  trending(@Query() query: TrendingTitlesDto) {
-    return this.titlesService.getTrending(query.type ?? 'movie');
+  trending(
+    @Query() query: TrendingTitlesDto,
+    @Headers('accept-language') language?: string,
+  ) {
+    return this.titlesService.getTrending(query.type ?? 'movie', language);
   }
 
   @Get('search')
-  search(@Query() query: SearchTitlesDto) {
-    return this.titlesService.search(query.q, query.type);
+  search(
+    @Query() query: SearchTitlesDto,
+    @Headers('accept-language') language?: string,
+  ) {
+    return this.titlesService.search(query.q, query.type, language);
   }
 
   @Get(':tmdbId')
-  detail(@Param('tmdbId') tmdbId: string, @Query('type') type?: 'movie' | 'tv') {
-    return this.titlesService.getByTmdbId(Number(tmdbId), type ?? 'movie');
+  detail(
+    @Param('tmdbId') tmdbId: string,
+    @Query('type') type?: 'movie' | 'tv',
+    @Headers('accept-language') language?: string,
+  ) {
+    return this.titlesService.getByTmdbId(Number(tmdbId), type ?? 'movie', language);
   }
 }

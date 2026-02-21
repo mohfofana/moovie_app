@@ -8,11 +8,13 @@ import { Casts, Videos, Genre } from "./components";
 
 import { titlesService, type TitleDetails } from "@/services/titlesService";
 import { watchlistService } from "@/services/watchlistService";
+import { useLanguage } from "@/context/languageContext";
 import { useMotion } from "@/hooks/useMotion";
 import { mainHeading, maxWidth, paragraph } from "@/styles";
 import { cn } from "@/utils/helper";
 
 const Detail = () => {
+  const { t } = useLanguage();
   const { category, id } = useParams();
   const [show, setShow] = useState<Boolean>(false);
   const [movie, setMovie] = useState<TitleDetails | null>(null);
@@ -187,7 +189,7 @@ const Detail = () => {
                 )}
               >
                 <HiBookmark size={18} />
-                {isInWatchlist ? "In Watchlist" : "Add to Watchlist"}
+                {isInWatchlist ? t.detail.inWatchlist : t.detail.addToWatchlist}
               </button>
 
               <button
@@ -202,7 +204,7 @@ const Detail = () => {
                 )}
               >
                 <HiHeart size={18} />
-                {isInFavorites ? "Favorited" : "Add to Favorites"}
+                {isInFavorites ? t.detail.favorited : t.detail.addToFavorites}
               </button>
             </m.div>
 
@@ -220,7 +222,7 @@ const Detail = () => {
                 )}
                 onClick={toggleShow}
               >
-                {!show ? "Read more →" : "Show less ←"}
+                {!show ? t.detail.readMore : t.detail.showLess}
               </button>
             </m.p>
 

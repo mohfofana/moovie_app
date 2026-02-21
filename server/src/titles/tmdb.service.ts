@@ -32,8 +32,9 @@ export class TmdbService {
     this.apiKey = this.configService.get<string>('TMDB_API_KEY', '');
   }
 
-  async getTrending(type: 'movie' | 'tv'): Promise<TmdbListResponse> {
-    const url = `${this.baseUrl}/trending/${type}/week?api_key=${this.apiKey}`;
+  async getTrending(type: 'movie' | 'tv', language?: string): Promise<TmdbListResponse> {
+    const lang = language || 'fr-FR';
+    const url = `${this.baseUrl}/trending/${type}/week?api_key=${this.apiKey}&language=${lang}`;
     const data = await this.fetchJson<TmdbListResponse>(url);
     return {
       ...data,
@@ -45,9 +46,10 @@ export class TmdbService {
     };
   }
 
-  async search(query: string, type?: 'movie' | 'tv'): Promise<TmdbListResponse> {
+  async search(query: string, type?: 'movie' | 'tv', language?: string): Promise<TmdbListResponse> {
+    const lang = language || 'fr-FR';
     const endpoint = type ? `/search/${type}` : '/search/multi';
-    const url = `${this.baseUrl}${endpoint}?api_key=${this.apiKey}&query=${encodeURIComponent(query)}`;
+    const url = `${this.baseUrl}${endpoint}?api_key=${this.apiKey}&query=${encodeURIComponent(query)}&language=${lang}`;
     const data = await this.fetchJson<TmdbListResponse>(url);
 
     const normalizedResults = (data.results || [])
@@ -78,8 +80,9 @@ export class TmdbService {
     };
   }
 
-  async getDetails(tmdbId: number, type: 'movie' | 'tv') {
-    const url = `${this.baseUrl}/${type}/${tmdbId}?api_key=${this.apiKey}&append_to_response=credits,videos`;
+  async getDetails(tmdbId: number, type: 'movie' | 'tv', language?: string) {
+    const lang = language || 'fr-FR';
+    const url = `${this.baseUrl}/${type}/${tmdbId}?api_key=${this.apiKey}&language=${lang}&append_to_response=credits,videos`;
     return this.fetchJson<any>(url);
   }
 

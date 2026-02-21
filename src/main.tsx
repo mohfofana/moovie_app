@@ -8,6 +8,7 @@ import { tmdbApi } from "@/services/TMDB";
 import GlobalContextProvider from "@/context/globalContext";
 import ThemeProvider from "@/context/themeContext";
 import { AuthProvider } from "@/context/authContext";
+import { LanguageProvider } from "@/context/languageContext";
 import App from "./App";
 import "./index.css";
 
@@ -15,15 +16,17 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <BrowserRouter>
       <ApiProvider api={tmdbApi}>
-        <ThemeProvider>
-          <GlobalContextProvider>
-            <AuthProvider>
-              <LazyMotion features={domAnimation}>
-                <App />
-              </LazyMotion>
-            </AuthProvider>
-          </GlobalContextProvider>
-        </ThemeProvider>
+        <LanguageProvider>
+          <ThemeProvider>
+            <GlobalContextProvider>
+              <AuthProvider>
+                <LazyMotion features={domAnimation}>
+                  <App />
+                </LazyMotion>
+              </AuthProvider>
+            </GlobalContextProvider>
+          </ThemeProvider>
+        </LanguageProvider>
       </ApiProvider>
     </BrowserRouter>
   </React.StrictMode>

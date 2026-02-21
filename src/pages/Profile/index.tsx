@@ -2,10 +2,12 @@ import { useState, useRef } from 'react';
 import { m } from 'framer-motion';
 import { HiCamera, HiPencil, HiCheck, HiX } from 'react-icons/hi';
 import { useAuth } from '@/context/authContext';
+import { useLanguage } from '@/context/languageContext';
 import { cn } from '@/utils/helper';
 
 const Profile = () => {
   const { user, updateUser, isLoading } = useAuth();
+  const { locale, setLocale } = useLanguage();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     username: user?.username || '',
@@ -275,13 +277,16 @@ const Profile = () => {
             {/* Language Preference */}
             <div className="flex items-center justify-between py-3 border-b border-white/5">
               <div>
-                <p className="text-white font-medium text-sm">Language</p>
-                <p className="text-gray-400 text-xs mt-1">Choose your preferred language</p>
+                <p className="text-white font-medium text-sm">Langue / Language</p>
+                <p className="text-gray-400 text-xs mt-1">Choisissez votre langue préférée</p>
               </div>
-              <select className="bg-white/5 border border-white/10 text-white rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-white/25">
-                <option value="en">English</option>
+              <select
+                value={locale}
+                onChange={(e) => setLocale(e.target.value as 'fr' | 'en')}
+                className="bg-white/5 border border-white/10 text-white rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-white/25 cursor-pointer"
+              >
                 <option value="fr">Français</option>
-                <option value="es">Español</option>
+                <option value="en">English</option>
               </select>
             </div>
 

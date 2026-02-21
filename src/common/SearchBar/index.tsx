@@ -4,6 +4,7 @@ import { m, AnimatePresence } from 'framer-motion';
 import { HiSearch } from 'react-icons/hi';
 import { IoClose } from 'react-icons/io5';
 import { titlesService } from '@/services/titlesService';
+import { useLanguage } from '@/context/languageContext';
 import { cn } from '@/utils/helper';
 import { IMG_URL } from '@/utils/config';
 
@@ -18,6 +19,7 @@ interface SearchResult {
 }
 
 const SearchBar = () => {
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
@@ -127,7 +129,7 @@ const SearchBar = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onFocus={handleFocus}
-          placeholder="Search movies & shows..."
+          placeholder={t.search.placeholder}
           className="bg-transparent border-none outline-none text-white placeholder-gray-500 text-[14px] w-[200px] xl:w-[260px]"
         />
         {searchQuery && (
@@ -183,7 +185,7 @@ const SearchBar = () => {
                       </h4>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="text-gray-400 text-xs capitalize">
-                          {result.media_type === 'movie' ? 'Movie' : 'TV Show'}
+                          {result.media_type === 'movie' ? t.search.movie : t.search.tvShow}
                         </span>
                         {result.vote_average && result.vote_average > 0 && (
                           <>
@@ -211,7 +213,7 @@ const SearchBar = () => {
                   }}
                   className="text-accent-cyan text-sm hover:underline"
                 >
-                  View all results for "{debouncedQuery}"
+                  {t.search.viewAll} "{debouncedQuery}"
                 </button>
               </div>
             )}

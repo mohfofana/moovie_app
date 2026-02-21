@@ -7,8 +7,10 @@ import type { WatchlistItem } from '@/types/user';
 import { Loader } from '@/common';
 import { cn } from '@/utils/helper';
 import { IMG_URL } from '@/utils/config';
+import { useLanguage } from '@/context/languageContext';
 
 const Watchlist = () => {
+  const { t } = useLanguage();
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -54,10 +56,10 @@ const Watchlist = () => {
         >
           <div className="flex items-center gap-3 mb-2">
             <HiBookmark className="text-accent-cyan text-3xl" />
-            <h1 className="text-4xl font-bold text-white">My Watchlist</h1>
+            <h1 className="text-4xl font-bold text-white">{t.watchlist.title}</h1>
           </div>
           <p className="text-gray-400 text-sm">
-            {watchlist.length} {watchlist.length === 1 ? 'title' : 'titles'} saved to watch later
+            {t.watchlist.itemCount(watchlist.length)}
           </p>
         </m.div>
 
@@ -79,15 +81,15 @@ const Watchlist = () => {
             <div className="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center mb-6">
               <HiBookmark className="text-gray-600 text-5xl" />
             </div>
-            <h2 className="text-2xl font-bold text-white mb-2">Your watchlist is empty</h2>
+            <h2 className="text-2xl font-bold text-white mb-2">{t.watchlist.empty}</h2>
             <p className="text-gray-400 text-sm mb-8 text-center max-w-md">
-              Start adding movies and TV shows you want to watch. They'll appear here.
+              {t.watchlist.emptyMessage}
             </p>
             <button
               onClick={() => navigate('/')}
               className="px-6 py-3 rounded-lg bg-white text-black font-semibold hover:bg-gray-100 transition-all"
             >
-              Browse Content
+              {t.common.browseContent}
             </button>
           </m.div>
         )}

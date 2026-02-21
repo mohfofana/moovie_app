@@ -8,6 +8,7 @@ import Error from "../Error";
 
 import { useGetShowsQuery } from "@/services/TMDB";
 import { useTheme } from "@/context/themeContext";
+import { useLanguage } from "@/context/languageContext";
 import { cn, getErrorMessage } from "@/utils/helper";
 
 interface SectionProps {
@@ -34,6 +35,7 @@ const Section: FC<SectionProps> = ({
   });
 
   const { theme } = useTheme();
+  const { t } = useLanguage();
 
   const {
     data = { results: [] },
@@ -72,7 +74,7 @@ const Section: FC<SectionProps> = ({
         </h3>
         {!showSimilarShows && (
           <Link to={`/${category}?type=${type}`} className={linkStyle}>
-            See All
+            {t.common.seeAll}
           </Link>
         )}
       </div>

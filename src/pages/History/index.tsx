@@ -3,11 +3,13 @@ import { m } from 'framer-motion';
 import { HiClock, HiX, HiCheck, HiStar } from 'react-icons/hi';
 import { useNavigate } from 'react-router-dom';
 import { historyService } from '@/services/historyService';
+import { useLanguage } from '@/context/languageContext';
 import type { WatchHistory } from '@/types/user';
 import { Loader } from '@/common';
 import { cn } from '@/utils/helper';
 
 const History = () => {
+  const { t } = useLanguage();
   const [history, setHistory] = useState<WatchHistory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -38,7 +40,7 @@ const History = () => {
   };
 
   const handleClearAll = async () => {
-    if (!window.confirm('Are you sure you want to clear all watch history?')) return;
+    if (!window.confirm(t.history.confirmClear)) return;
 
     try {
       await historyService.clearHistory();
@@ -65,19 +67,19 @@ const History = () => {
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-3">
               <HiClock className="text-accent-cyan text-3xl" />
-              <h1 className="text-4xl font-bold text-white">Watch History</h1>
+              <h1 className="text-4xl font-bold text-white">{t.history.title}</h1>
             </div>
             {history.length > 0 && (
               <button
                 onClick={handleClearAll}
                 className="px-4 py-2 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-all text-sm font-medium"
               >
-                Clear All
+                {t.history.clearAll}
               </button>
             )}
           </div>
           <p className="text-gray-400 text-sm">
-            {history.length} {history.length === 1 ? 'item' : 'items'} in your watch history
+            {t.history.itemCount(history.length)}
           </p>
         </m.div>
 
@@ -99,15 +101,15 @@ const History = () => {
             <div className="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center mb-6">
               <HiClock className="text-gray-600 text-5xl" />
             </div>
-            <h2 className="text-2xl font-bold text-white mb-2">No watch history</h2>
+            <h2 className="text-2xl font-bold text-white mb-2">{t.history.empty}</h2>
             <p className="text-gray-400 text-sm mb-8 text-center max-w-md">
-              Start watching movies and TV shows. Your watch history will appear here.
+              {t.history.emptyMessage}
             </p>
             <button
               onClick={() => navigate('/')}
               className="px-6 py-3 rounded-lg bg-white text-black font-semibold hover:bg-gray-100 transition-all"
             >
-              Start Watching
+              {t.history.startWatching}
             </button>
           </m.div>
         )}
@@ -162,7 +164,7 @@ const History = () => {
                           <span>•</span>
                           <span className="flex items-center gap-1 text-green-400">
                             <HiCheck size={16} />
-                            Completed
+                            {t.history.completed}
                           </span>
                         </>
                       )}
@@ -171,7 +173,7 @@ const History = () => {
                     {/* Progress Bar */}
                     <div className="mb-2">
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs text-gray-500">Progress</span>
+                        <span className="text-xs text-gray-500">{t.history.progress}</span>
                         <span className="text-xs text-gray-400">{item.progress}%</span>
                       </div>
                       <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">

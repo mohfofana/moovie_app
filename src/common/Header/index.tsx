@@ -13,6 +13,7 @@ import UserMenu from "../UserMenu";
 
 import { useGlobalContext } from "@/context/globalContext";
 import { useTheme } from "@/context/themeContext";
+import { useLanguage } from "@/context/languageContext";
 import { maxWidth } from "@/styles";
 import { navLinks } from "@/constants";
 import { THROTTLE_DELAY } from "@/utils/config";
@@ -21,10 +22,24 @@ import { cn } from "@/utils/helper";
 const Header = () => {
   const { openMenu, theme, showThemeOptions } = useTheme();
   const { setShowSidebar } = useGlobalContext();
+  const { locale, setLocale, t } = useLanguage();
 
   const [isActive, setIsActive] = useState<boolean>(false);
   const [isNotFoundPage, setIsNotFoundPage] = useState<boolean>(false);
   const location = useLocation();
+
+  // Translate navigation links
+  const translatedNavLinks = navLinks.map(link => {
+    const titleMap: Record<string, string> = {
+      'home': t.nav.home,
+      'movies': t.nav.movies,
+      'tv series': t.nav.tvShows,
+    };
+    return {
+      ...link,
+      title: titleMap[link.title.toLowerCase()] || link.title,
+    };
+  });
 
   useEffect(() => {
     const handleBackgroundChange = () => {
@@ -82,10 +97,10 @@ const Header = () => {
 
         <div className="hidden md:flex flex-row gap-12 items-center text-gray-700 dark:text-gray-400">
           <ul className="flex flex-row gap-8 text-[14px] font-medium">
-            {navLinks.map((link: { title: string; path: string }) => {
+            {translatedNavLinks.map((link: { title: string; path: string }) => {
               return (
                 <HeaderNavItem
-                  key={link.title}
+                  key={link.path}
                   link={link}
                   isNotFoundPage={isNotFoundPage}
                   showBg={isActive}
@@ -115,6 +130,20 @@ const Header = () => {
               {showThemeOptions && <ThemeMenu />}
             </AnimatePresence>
           </div>
+
+          <button
+            type="button"
+            onClick={() => setLocale(locale === 'fr' ? 'en' : 'fr')}
+            className={cn(
+              `px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 hover:bg-white/10`,
+              isNotFoundPage || isActive
+                ? `text-gray-700 dark:text-white`
+                : `text-white/90`
+            )}
+            title={locale === 'fr' ? 'Switch to English' : 'Changer en Français'}
+          >
+            {locale === 'fr' ? 'FR' : 'EN'}
+          </button>
 
           <UserMenu isNotFoundPage={isNotFoundPage} showBg={isActive} />
         </div>

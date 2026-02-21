@@ -7,8 +7,10 @@ import type { FavoriteItem } from '@/types/user';
 import { Loader } from '@/common';
 import { cn } from '@/utils/helper';
 import { IMG_URL } from '@/utils/config';
+import { useLanguage } from '@/context/languageContext';
 
 const Favorites = () => {
+  const { t } = useLanguage();
   const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -54,10 +56,10 @@ const Favorites = () => {
         >
           <div className="flex items-center gap-3 mb-2">
             <HiHeart className="text-red-500 text-3xl" />
-            <h1 className="text-4xl font-bold text-white">My Favorites</h1>
+            <h1 className="text-4xl font-bold text-white">{t.favorites.title}</h1>
           </div>
           <p className="text-gray-400 text-sm">
-            {favorites.length} {favorites.length === 1 ? 'favorite' : 'favorites'}
+            {t.favorites.itemCount(favorites.length)}
           </p>
         </m.div>
 
@@ -79,15 +81,15 @@ const Favorites = () => {
             <div className="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center mb-6">
               <HiHeart className="text-gray-600 text-5xl" />
             </div>
-            <h2 className="text-2xl font-bold text-white mb-2">No favorites yet</h2>
+            <h2 className="text-2xl font-bold text-white mb-2">{t.favorites.empty}</h2>
             <p className="text-gray-400 text-sm mb-8 text-center max-w-md">
-              Mark your favorite movies and TV shows with a heart. They'll appear here.
+              {t.favorites.emptyMessage}
             </p>
             <button
               onClick={() => navigate('/')}
               className="px-6 py-3 rounded-lg bg-white text-black font-semibold hover:bg-gray-100 transition-all"
             >
-              Browse Content
+              {t.common.browseContent}
             </button>
           </m.div>
         )}

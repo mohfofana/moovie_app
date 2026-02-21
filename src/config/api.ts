@@ -12,13 +12,18 @@ export const apiClient = axios.create({
   timeout: 10000,
 });
 
-// Request interceptor - add auth token
+// Request interceptor - add auth token and language
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('accessToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    // Add language preference header
+    const locale = localStorage.getItem('locale') || 'fr';
+    config.headers['Accept-Language'] = locale === 'fr' ? 'fr-FR' : 'en-US';
+
     return config;
   },
   (error) => {

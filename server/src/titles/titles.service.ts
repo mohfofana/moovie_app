@@ -10,20 +10,20 @@ export class TitlesService {
     private readonly prisma: PrismaService,
   ) {}
 
-  async getTrending(type: 'movie' | 'tv') {
-    const data = await this.tmdb.getTrending(type);
+  async getTrending(type: 'movie' | 'tv', language?: string) {
+    const data = await this.tmdb.getTrending(type, language);
     await this.persistTitles(data.results);
     return data;
   }
 
-  async search(query: string, type?: 'movie' | 'tv') {
-    const data = await this.tmdb.search(query, type);
+  async search(query: string, type?: 'movie' | 'tv', language?: string) {
+    const data = await this.tmdb.search(query, type, language);
     await this.persistTitles(data.results);
     return data;
   }
 
-  async getByTmdbId(tmdbId: number, type: 'movie' | 'tv') {
-    const details = await this.tmdb.getDetails(tmdbId, type);
+  async getByTmdbId(tmdbId: number, type: 'movie' | 'tv', language?: string) {
+    const details = await this.tmdb.getDetails(tmdbId, type, language);
     await this.persistTitles([
       {
         id: details.id,
