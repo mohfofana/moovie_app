@@ -3,7 +3,7 @@ import { m } from "framer-motion";
 import { useParams } from "react-router-dom";
 import { HiBookmark, HiHeart } from "react-icons/hi";
 
-import { Poster, Loader, Error, Section } from "@/common";
+import { Poster, Loader, Error, Section, VideoBackground } from "@/common";
 import { Casts, Videos, Genre } from "./components";
 
 import { titlesService, type TitleDetails } from "@/services/titlesService";
@@ -128,26 +128,45 @@ const Detail = () => {
     genres,
     videos,
     credits,
+    backdrop_path: backdropPath,
   } = movie;
 
-  const backgroundStyle = {
-    backgroundImage: `
-      radial-gradient(circle at 20% 30%, rgba(0, 217, 255, 0.08), transparent 35%),
-      radial-gradient(circle at 80% 70%, rgba(255, 0, 128, 0.06), transparent 35%),
-      linear-gradient(to top, rgba(10,10,10,1), rgba(10,10,10,0.98) 60%, rgba(10,10,10,0.85) 80%, rgba(10,10,10,0.5)),
-      url('https://image.tmdb.org/t/p/original/${posterPath}')`,
-    backgroundPosition: "top center",
-    backgroundSize: "cover",
+  // Get trailer video key
+  const getTrailerKey = () => {
+    if (!videos?.results || videos.results.length === 0) {
+      return null;
+    }
+
+    // Try to find a trailer
+    const trailer = videos.results.find(
+      (video: any) => video.type === 'Trailer' && video.site === 'YouTube'
+    );
+
+    if (trailer) {
+      return trailer.key;
+    }
+
+    // Fallback to first YouTube video
+    const firstVideo = videos.results.find((video: any) => video.site === 'YouTube');
+    return firstVideo?.key || null;
   };
+
+  const videoKey = getTrailerKey();
 
   return (
     <>
-      <section className="w-full relative" style={backgroundStyle}>
+      <section className="w-full relative">
+        {/* Video/Image Background */}
+        <VideoBackground
+          videoKey={videoKey || undefined}
+          backdropPath={backdropPath || posterPath}
+        />
+
         {/* Grain overlay */}
-        <div className="absolute inset-0 opacity-20 mix-blend-overlay pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
+        <div className="absolute inset-0 opacity-20 mix-blend-overlay pointer-events-none z-20" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
 
         <div
-          className={`${maxWidth} lg:py-40 sm:py-36 sm:pb-32 xs:py-32 xs:pb-16 pt-28 pb-12 flex flex-row lg:gap-16 md:gap-12 gap-10 justify-center relative z-10`}
+          className={`${maxWidth} lg:py-40 sm:py-36 sm:pb-32 xs:py-32 xs:pb-16 pt-28 pb-12 flex flex-row lg:gap-16 md:gap-12 gap-10 justify-center relative z-30`}
         >
           <Poster title={title} posterPath={posterPath} />
           <m.div

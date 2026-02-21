@@ -12,6 +12,7 @@ import ThemeMenu from "./ThemeMenu";
 import Section from "./Section";
 import SearchBar from "./SearchBar";
 import UserMenu from "./UserMenu";
+import VideoBackground from "./VideoBackground";
 
 export {
   Footer,
@@ -29,4 +30,5 @@ export {
   Section,
   SearchBar,
   UserMenu,
+  VideoBackground,
 };
